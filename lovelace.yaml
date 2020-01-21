@@ -1,0 +1,134 @@
+  - badges: []
+    cards:
+      - entities:
+          - entity: sensor.vacuum_phase
+          - entity: sensor.vacuum_cycle
+          - entity: sensor.vacuum_battery
+          - entity: sensor.vacuum_bin
+          - entity: sensor.vacuum_dock
+          - entity: sensor.vacuum_location
+          - entities:
+              - input_boolean.vacuum_kitchen
+              - input_boolean.vacuum_entry
+              - input_boolean.vacuum_hall
+              - input_boolean.vacuum_living_room
+              - input_boolean.vacuum_bathroom
+              - input_boolean.vacuum_bedroom
+              - input_boolean.vacuum_wardrobe
+              - input_boolean.vacuum_master_ensuite
+              - input_boolean.vacuum_master_bedroom
+              - input_boolean.vacuum_table
+              - entity: automation.vacuum_clean_rooms
+                lock:
+                  enabled: |
+                    [[[
+                      if (states['group.vacuum_rooms'].state == "off")
+                        return true;
+                      return false;
+                    ]]]
+                  exemptions: []
+                name: Clean Rooms
+                styles:
+                  card:
+                    - height: 50px
+                tap_action:
+                  action: call-service
+                  service: automation.trigger
+                  service_data:
+                    entity_id: automation.vacuum_clean_rooms
+                type: 'custom:button-card'
+            head:
+              label: Selective Room Cleaning
+              type: section
+            type: 'custom:fold-entity-row'
+        show_header_toggle: false
+        type: entities
+      - cards:
+          - entity: rest_command.vacuum_action
+            icon: |
+              [[[
+                if (states['sensor.vacuum_cycle'].state == "Ready")
+                  return "mdi:play";
+                else if ((states['sensor.vacuum_phase'].state == "Stopped/Paused") || (states['sensor.vacuum_phase'].state == "Stuck") || (states['sensor.vacuum_phase'].state == "Charging"))
+                  return "mdi:play-pause";
+                return "mdi:pause"
+              ]]]
+            layout: icon_name
+            lock:
+              enabled: |
+                [[[
+                  if (states['sensor.vacuum_phase'].state == "Emptying Robot")
+                    return true;
+                  return false;
+                ]]]
+              exemptions: []
+            name: |
+              [[[
+                if (states['sensor.vacuum_cycle'].state == "Ready")
+                  return "Full Clean";
+                else if ((states['sensor.vacuum_phase'].state == "Stopped/Paused") || (states['sensor.vacuum_phase'].state == "Stuck") || (states['sensor.vacuum_phase'].state == "Charging"))
+                  return "Resume";
+                return "Pause"
+              ]]]
+            styles:
+              card:
+                - height: 50px
+            tap_action:
+              action: call-service
+              service: rest_command.vacuum_action
+              service_data:
+                command: |
+                  [[[
+                    if (states['sensor.vacuum_cycle'].state == "Ready")
+                      return "start";
+                    else if ((states['sensor.vacuum_phase'].state == "Stopped/Paused") || (states['sensor.vacuum_phase'].state == "Stuck") || (states['sensor.vacuum_phase'].state == "Charging"))
+                      return "resume";
+                    return "pause"
+                  ]]]
+            hold_action:
+              action: call-service
+              service: rest_command.vacuum_action
+              service_data:
+                command: |
+                  [[[
+                    if (states['sensor.vacuum_cycle'].state == "Ready")
+                      return "start";
+                    else if ((states['sensor.vacuum_phase'].state == "Stopped/Paused") || (states['sensor.vacuum_phase'].state == "Stuck") || (states['sensor.vacuum_phase'].state == "Charging"))
+                      return "stop";
+                    return "stop"
+                  ]]]
+            type: 'custom:button-card'
+          - entity: rest_command.vacuum_action
+            icon: 'mdi:home-minus'
+            layout: icon_name
+            lock:
+              enabled: |
+                [[[
+                  if (states['sensor.vacuum_phase'].state == "Emptying Robot")
+                    return true;
+                  return false;
+                ]]]
+              exemptions: []
+            name: |
+              [[[
+                if ((states['sensor.vacuum_phase'].state == "Charging") || (states['sensor.vacuum_phase'].state == "Fully Charged") || (states['sensor.vacuum_phase'].state == "Emptying Robot"))
+                  return "Empty Bin";
+                return "Dock"
+              ]]]
+            styles:
+              card:
+                - height: 50px
+            tap_action:
+              action: call-service
+              service: rest_command.vacuum_action
+              service_data:
+                command: dock
+            type: 'custom:button-card'
+        type: horizontal-stack
+      - aspect_ratio: 0%
+        camera_image: camera.roomba
+        entities: []
+        type: picture-glance
+    icon: 'mdi:robot-vacuum'
+    path: vacuum
+    title: Vacuum

@@ -1,0 +1,34 @@
+###################################
+# Docker Compose
+###################################
+
+version: '3'
+services:
+  rest980:
+    container_name: rest980
+    image: koalazak/rest980:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - BLID=<BLID>
+      - PASSWORD=<PW>
+      - ROBOT_IP=<IP>
+      - FIRMWARE_VERSION=2
+    restart: unless-stopped
+    networks:
+      - docker
+  php_nginx:
+    container_name: php_nginx
+    image: webdevops/php-nginx:latest
+    environment:
+      WEB_DOCUMENT_INDEX: "image.php"
+    volumes:
+      - /<HA CONFIG PATH>/roomba:/app
+    ports:
+      - "3001:80"
+    restart: unless-stopped
+    networks:
+      - docker
+networks:
+  docker:
+    external: true

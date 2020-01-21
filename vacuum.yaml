@@ -1,0 +1,360 @@
+###################################
+# iRobot Vacuum Package
+###################################
+
+###################################
+# Sensor
+###################################
+
+sensor:
+  # Roomba via Rest980 Docker Image
+  - platform: rest
+    name: rest980
+    json_attributes:
+      - batPct
+      - bin
+      - cleanMissionStatus
+      - dock
+      - pose
+    resource: !secret vacuum_state
+    value_template: 'OK'
+    scan_interval: 10
+  - platform: template
+    sensors:
+      vacuum_battery:
+        friendly_name_template: >-
+          {{ states('input_text.vacuum_name') }} Battery
+        value_template: >-
+          {{ state_attr('sensor.rest980', 'batPct') }}
+        unit_of_measurement: '%'
+        device_class: battery
+      vacuum_cycle:
+        friendly_name_template: >-
+          {{ states('input_text.vacuum_name') }} Cycle
+        value_template: >-
+          {% set mapper =  {
+            'clean' : 'Cleaning',
+            'evac' : 'Emptying Robot',
+            'dock' : 'Returning Home',
+            'none' : 'Ready' } %}
+          {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')["cycle"] %}
+          {{ mapper[state] if state in mapper else 'Unknown' }}
+        icon_template: mdi:broom
+      vacuum_phase:
+        friendly_name_template: >-
+          {{ states('input_text.vacuum_name') }} Status
+        value_template: >-
+          {% if state_attr('sensor.rest980', 'cleanMissionStatus')["phase"] == 'charge' and state_attr('sensor.rest980', 'batPct') == 100 %}
+            Fully Charged
+          {% else %}
+            {% set mapper =  {
+            'charge' : 'Charging',
+            'run' : 'Cleaning',
+            'evac' : 'Emptying Robot',
+            'stop' : 'Stopped/Paused',
+            'stuck' : 'Stuck',
+            'hmUsrDock' : 'Sent Home',
+            'hmMidMsn' : 'Returning Home mid Clean',
+            'hmPostMsn' : 'Returning Home' } %}
+            {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')["phase"] %}
+            {{ mapper[state] if state in mapper else 'Unknown' }}
+          {% endif %}
+          
+        icon_template: mdi:settings
+      vacuum_bin:
+        friendly_name_template: >-
+          {{ states('input_text.vacuum_name') }} Bin Status
+        value_template: >-
+          {% set mapper =  {
+            true : 'Full',
+            false : 'Not Full' } %}
+          {% set state =  state_attr('sensor.rest980', 'bin')["full"] %}
+          {{ mapper[state] if state in mapper else 'Unknown' }}
+        icon_template: mdi:delete
+      vacuum_dock:
+        friendly_name_template: >-
+          {{ states('input_text.vacuum_name') }} Clean Base Status
+        value_template: >-
+          {% set mapper =  {
+            300 : 'Ready',
+            301 : 'Ready',
+            302 : 'Emptying Robot',
+            350 : 'Bag Missing',
+            351 : 'Base Clogged',
+            353 : 'Bag Full' } %}
+          {% set state =  state_attr('sensor.rest980', 'dock')["state"] %}
+          {{ mapper[state] if state in mapper else 'Unknown' }}
+        icon_template: mdi:home-minus
+      vacuum_location:
+        friendly_name_template: >-
+          {{ states('input_text.vacuum_name') }} Location
+        value_template: >-
+          {% if state_attr('sensor.rest980', 'pose')['theta'] is defined %}
+            ({{ state_attr('sensor.rest980', 'pose')['point']['x'] }}, {{ state_attr('sensor.rest980', 'pose')['point']['y'] }}, {{ state_attr('sensor.rest980', 'pose')['theta'] }})
+          {% else %}
+            Unavailable
+          {% endif %}
+        icon_template: mdi:home-map-marker
+
+###################################
+# Rest Command
+###################################
+
+rest_command:
+  vacuum_action:
+    url: >-
+      {{ states('input_text.vacuum_action') }}{{ command }}
+    verify_ssl: !secret vacuum_verify_ssl
+    method: 'get'
+    timeout: 20
+  vacuum_clean:
+    url: >-
+      {{ states('input_text.vacuum_action') }}cleanRoom
+    verify_ssl: !secret vacuum_verify_ssl
+    method: POST
+    content_type: 'application/json'
+    payload: '{{ payload }}'
+  vacuum_clear_image:
+    url: >-
+      {{ states("input_text.vacuum_map") }}?clear=true
+    verify_ssl: !secret vacuum_verify_ssl
+    method: 'get'
+  vacuum_generate_image:
+    url: >-
+      {{ states("input_text.vacuum_map") }}?last=true
+    verify_ssl: !secret vacuum_verify_ssl
+    method: 'get'
+
+###################################
+# Input Boolean
+###################################
+
+input_boolean:
+  vacuum_kitchen:
+    name: Kitchen
+    icon: mdi:silverware-fork-knife
+  vacuum_entry:
+    name: Entry
+    icon: mdi:coat-rack
+  vacuum_hall:
+    name: Hall
+    icon: mdi:ceiling-light
+  vacuum_living_room:
+    name: Living Room
+    icon: mdi:sofa
+  vacuum_bathroom:
+    name: Bathroom
+    icon: mdi:shower
+  vacuum_bedroom:
+    name: Bedroom
+    icon: mdi:bed-empty
+  vacuum_wardrobe:
+    name: Wardrobe
+    icon: mdi:wardrobe-outline
+  vacuum_master_ensuite:
+    name: Master Ensuite
+    icon: mdi:shower
+  vacuum_master_bedroom:
+    name: Master Bedroom
+    icon: mdi:bed-empty
+  vacuum_table:
+    name: Table
+    icon: mdi:room-service
+
+###################################
+# Input Text
+###################################
+
+input_text:
+  vacuum_name:
+    name: Vacuum Name
+    initial: !secret vacuum_name
+  vacuum_action:
+    name: Vacuum Action URL
+    initial: !secret vacuum_action
+  vacuum_map:
+    name: Vacuum Map URL
+    initial: !secret vacuum_map
+  vacuum_log:
+    name: Vacuum Log Path
+    initial: !secret vacuum_log
+  vacuum_floorplan:
+    name: Floorplan ID
+    initial: !secret vacuum_floorplan
+  vacuum_user_floorplan:
+    name: User Floorplan ID
+    initial: !secret vacuum_user_floorplan
+
+  vacuum_kitchen:
+    name: Kitchen
+    initial: !secret vacuum_kitchen
+  vacuum_entry:
+    name: Entry
+    initial: !secret vacuum_entry
+  vacuum_hall:
+    name: Hall
+    initial: !secret vacuum_hall
+  vacuum_living_room:
+    name: Living Room
+    initial: !secret vacuum_living_room
+  vacuum_bathroom:
+    name: Bathroom
+    initial: !secret vacuum_bathroom
+  vacuum_bedroom:
+    name: Bedroom
+    initial: !secret vacuum_bedroom
+  vacuum_wardrobe:
+    name: Wardrobe
+    initial: !secret vacuum_wardrobe
+  vacuum_master_ensuite:
+    name: Master Ensuite
+    initial: !secret vacuum_master_ensuite
+  vacuum_master_bedroom:
+    name: Master Bedroom
+    initial: !secret vacuum_master_bedroom
+  vacuum_table:
+    name: Table
+    initial: !secret vacuum_table
+
+###################################
+# Group
+###################################
+
+group:
+  vacuum_rooms:
+    - input_boolean.vacuum_kitchen
+    - input_boolean.vacuum_entry
+    - input_boolean.vacuum_hall
+    - input_boolean.vacuum_living_room
+    - input_boolean.vacuum_bathroom
+    - input_boolean.vacuum_bedroom
+    - input_boolean.vacuum_wardrobe
+    - input_boolean.vacuum_master_ensuite
+    - input_boolean.vacuum_master_bedroom
+    - input_boolean.vacuum_table
+
+###################################
+# Automation
+###################################
+
+automation:
+  # Initiate Selective Room Clean
+  - alias: Vacuum Clean Rooms
+    hide_entity: true
+    trigger:
+    - platform: event
+      event_type: initiate_vacuum_clean       
+    action:
+      - service: rest_command.vacuum_clean
+        data_template:
+          payload: >
+            {
+              "ordered": 0,
+              "pmap_id": "{{ states('input_text.vacuum_floorplan') | string }}",
+              "regions": [{% for boolean in states.input_boolean if 'vacuum' in boolean.entity_id and is_state(boolean.entity_id, 'on') %}
+                {% set room = 'input_text.' + boolean.entity_id.split('.')[1] %} {{ states(room) | string }} {%- if not loop.last %},{%- endif %}
+                {%- endfor %}
+              ],
+              "user_pmapv_id": "{{ states('input_text.vacuum_user_floorplan') | string }}"
+            }
+      - service: input_boolean.turn_off
+        data:
+          entity_id: group.vacuum_rooms
+
+  # Update Vacuum REST Sensor for Location Details
+  - alias: Vacuum Update Location
+    initial_state: true
+    trigger:
+      - platform: time_pattern
+        seconds: /2
+      - platform: event
+        event_type: call_service
+        event_data:
+          domain: rest_command
+          service: vacuum_clean
+    condition: 
+      condition: state
+      entity_id: sensor.vacuum_cycle
+      state: 'Cleaning'
+    action:
+      - service: homeassistant.update_entity
+        entity_id: sensor.rest980
+  
+  # Log Vacuum Location to File
+  - alias: Vacuum Log Position
+    initial_state: true
+    trigger:
+        platform: state
+        entity_id: sensor.vacuum_location
+    condition:
+      condition: state
+      entity_id: sensor.vacuum_cycle
+      state: 'Cleaning'
+    action:
+      - service: notify.vacuumfile
+        data_template: 
+          message: "{{ states('sensor.vacuum_location') }}"
+               
+  # Initialize Blank Vacuum Log File
+  - alias: Vacuum Clean Log
+    initial_state: true
+    trigger:
+      platform: state
+      entity_id: sensor.vacuum_cycle
+      from: 'Ready'
+      to: 'Cleaning'
+    action:
+      - service: shell_command.vacuum_clear_log
+      - service: rest_command.vacuum_clear_image
+          
+  # Update Vacuum Log File with Finished Status
+  - alias: Vacuum Notify on Finished Cleaning
+    initial_state: true
+    trigger:
+      platform: state
+      entity_id: sensor.vacuum_cycle
+      from: 'Cleaning'
+      to: 'Ready'
+    action:
+      - service: notify.vacuumfile
+        data_template: 
+          message: "Finished"
+
+  # Generate Complete Vacuum Map
+  - alias: Vacuum Generate Image after Cleaning
+    initial_state: true
+    trigger:
+      platform: state
+      entity_id: sensor.vacuum_cycle
+      from: 'Cleaning'
+      to: 'Ready'
+      for:
+        seconds: 10
+    action:
+      service: rest_command.vacuum_generate_image
+
+###################################
+# Notify
+###################################
+
+notify:
+    - name: VacuumFile
+      platform: file
+      filename: !secret vacuum_log
+
+###################################
+# Camera
+###################################
+
+camera:
+  - platform: generic
+    still_image_url: !secret vacuum_map
+    content_type: image/png
+    name: Roomba
+
+###################################
+# Shell Command
+###################################
+
+shell_command:
+  vacuum_clear_log: cp /dev/null {{ states('input_text.vacuum_log') }}
