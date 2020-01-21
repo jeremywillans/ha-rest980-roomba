@@ -9,8 +9,8 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 ![Lovelace Example](lovelace_example.png)
 
 **Special Cheers** 
-- ** [Facu ZAK](https://github.com/koalazak) ** for creating dorita980 and rest980 which this leverages!
-- ** [gotschi](https://community.home-assistant.io/u/gotschi/summary) ** for creating the Roomba Map PHP file which this leverages!
+- **[Facu ZAK](https://github.com/koalazak)** for creating dorita980 and rest980 !
+- **[gotschi](https://community.home-assistant.io/u/gotschi/summary)** for creating the original Roomba Map PHP file !
 
 ### Step 1: Get Robot Login Details
 
