@@ -13,6 +13,7 @@ $flip_vertical = false;
 $flip_horizontal = false;
 $ha_rest980 = 'https://<ip or fqdn of home assistant>:<haport>/api/states/sensor.rest980';
 $ha_token = '<ha_long_live_token>';
+$ha_timezone = 'Australia/Brisbane'; # Supported Timezones https://www.php.net/manual/en/timezones.php
 /////////////////
 
 #if(isset($_GET['clear'])) {
@@ -183,6 +184,7 @@ else {
   $status="running";
 }
 
+date_default_timezone_set($ha_timezone);
 $dt = date('H:i:s Y-m-d', $date);
 $txt = "\nStarted: ".$dt."\n"."Status: ".$status.$string;
 $white = imagecolorallocate($image, 255, 255, 255);
