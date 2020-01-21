@@ -12,7 +12,7 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 - ** [Facu ZAK](https://github.com/koalazak) ** for creating dorita980 and rest980 which this leverages!
 - ** [gotschi](https://community.home-assistant.io/u/gotschi/summary) ** for creating the Roomba Map PHP file which this leverages!
 
-## Step 1: Get Robot Login Details
+### Step 1: Get Robot Login Details
 
 ```
 docker run -it node sh -c "npm install -g dorita980 && get-roomba-password <robotIP>"
@@ -22,14 +22,14 @@ If you dont have direct access to Docker (such as with Hass.io) you can clone an
 
 **Note:** Do not have iRobot App running on your phone when doing this !!!
 
-## Step 2: Configure Vacuum Map
+### Step 2: Configure Vacuum Map
 To allow the map to be correctly produced, you will need to create a new vacuum directory. I have chosen to put this inside the HA configuration directory, but you can choose to put this elsewhere and update the configuration accordingly (if you are using HASS and referencing my hass-addons repo, please leave this at the default!)
 
 Copy the contents of the Vacuum directory from Github into this folder.
 
 Note: The image.php file will need updating, but this will be done after the setup is complete.
 
-## Step 3: Configure Docker Compose / Run Image / Hass.io Add-on
+### Step 3: Configure Docker Compose / Run Image / Hass.io Add-on
 I use docker compose for all my HA related images, but have also listed the docker run command (copied from the rest980 github page)
 I have also included an example PHP Docker Image which i use to host the map.
 
@@ -66,7 +66,7 @@ http://<ip or fqdn of docker host>:<port>/api/local/info/state
 
 This will create a new local addon which you can install
 
-## Step 4: Get Room Details
+### Step 4: Get Room Details
 
 * Initiate a Clean Rooms clean from the iRobot App, ensuring you select all **BUT** one room! (if you select them all, it wont list them out. Perform a second clean on the remaining room to get all the details)
 * Navigate to ```http://<ip or fqdn of docker host>:<rest980port>/api/local/info/state```
@@ -75,7 +75,7 @@ This will create a new local addon which you can install
 -- user_pmapv_id
 -- regions (as you selected all the rooms, they should all be listed here)
 
-## Step 4: Configure Home Assistant Package and Secrets
+### Step 5: Configure Home Assistant Package and Secrets
 
 I split off the ids and regions into the secrets file to make it easier to manage for future updates (as i expect these will change if you update your floorplan from the iRobot app)
 
@@ -94,7 +94,7 @@ I have tried to map as many of the reported statuses, however i occasionally get
 Refer vacuum.yaml
 ```
 
-## Step 5: Configure Lovelace
+### Step 6: Configure Lovelace
 
 I have used the below lovelace configuration with the following HACS components
 
@@ -107,7 +107,7 @@ Note: This config is taken directly from Lovelace Raw Editor as a complete view.
 Refer lovelace.yaml
 ```
 
-## Step 6: Configure Map Options
+### Step 7: Configure Map Options
 
 After you have run a clean cycle, the map should be populating however it is unliekly not quite sized correctly.
 
@@ -118,7 +118,7 @@ I have moved these as variables at the top of the file making it easier to updat
 **Note:** Once the vacuum has completed is clean, the image.php file references the latest.png file in the local directory so your changes wont be reflected upon refresh.
 You can use the image-dev.php file as this has been updated to only create an in-memory copy of the map each time its refreshed.
 
-## Step 7: Enjoy!
+### Step 8: Enjoy!
 
 ## Support
 
