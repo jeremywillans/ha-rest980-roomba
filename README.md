@@ -47,7 +47,7 @@ docker network create docker
 **DOCKER RUN**
 ```
 docker run -e BLID=myuser -e PASSWORD=mypass -e ROBOT_IP=myrobotIP -e FIRMWARE_VERSION=2 -p 3000:3000 koalazak/rest980:latest
-docker run -p 3001:80 -v /<HA_CONFIG>/roomba:/app webdevops/php-nginx:latest
+docker run -p 3001:80 -v /<HA_CONFIG>/roomba:/app webhippie/php-nginx:latest
 ```
 
 Confirm you can access the WebUI

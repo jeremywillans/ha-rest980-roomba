@@ -17,15 +17,15 @@ services:
     restart: unless-stopped
     networks:
       - docker
-  php_nginx:
-    container_name: php_nginx
-    image: webdevops/php-nginx:latest
+  php-nginx:
+    container_name: php-nginx
+    image: webhippie/php-nginx:latest
     environment:
-      WEB_DOCUMENT_INDEX: "image.php"
+      NGINX_WEBROOT: "/app"
     volumes:
-      - /<HA CONFIG PATH>/roomba:/app
+      - /<HA CONFIG PATH>/vacuum:/app
     ports:
-      - "3001:80"
+      - "3001:8080"
     restart: unless-stopped
     networks:
       - docker
