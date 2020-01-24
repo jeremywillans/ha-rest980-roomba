@@ -114,16 +114,6 @@ rest_command:
     method: POST
     content_type: 'application/json'
     payload: '{{ payload }}'
-  vacuum_clear_image:
-    url: >-
-      {{ states("input_text.vacuum_map") }}?clear=true
-    verify_ssl: !secret vacuum_verify_ssl
-    method: 'get'
-  vacuum_generate_image:
-    url: >-
-      {{ states("input_text.vacuum_map") }}?last=true
-    verify_ssl: !secret vacuum_verify_ssl
-    method: 'get'
 
 ###################################
 # Input Boolean
@@ -305,7 +295,7 @@ automation:
       to: 'Cleaning'
     action:
       - service: shell_command.vacuum_clear_log
-      - service: rest_command.vacuum_clear_image
+      - service: shell_command.vacuum_clear_image
           
   # Update Vacuum Log File with Finished Status
   - alias: Vacuum Notify on Finished Cleaning
@@ -343,7 +333,7 @@ automation:
       for:
         seconds: 10
     action:
-      service: rest_command.vacuum_generate_image
+      service: shell_command.vacuum_generate_image
 
 ###################################
 # Notify
@@ -370,3 +360,5 @@ camera:
 
 shell_command:
   vacuum_clear_log: cp /dev/null {{ states('input_text.vacuum_log') }}
+  vacuum_clear_image: curl -X GET -s -O /dev/null '{{ states("input_text.vacuum_map") }}?clear=true'
+  vacuum_generate_image: curl -X GET -s -O /dev/null '{{ states("input_text.vacuum_map") }}?last=true'
