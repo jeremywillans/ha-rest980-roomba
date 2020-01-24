@@ -320,6 +320,18 @@ automation:
         data_template: 
           message: "Finished"
 
+  # Update Vacuum Log File with Stuck Status
+  - alias: Vacuum Notify on Stuck Status
+    initial_state: true
+    trigger:
+      platform: state
+      entity_id: sensor.vacuum_phase
+      to: 'Stuck'
+    action:
+      - service: notify.vacuumfile
+        data_template: 
+          message: "Stuck"
+
   # Generate Complete Vacuum Map
   - alias: Vacuum Generate Image after Cleaning
     initial_state: true
