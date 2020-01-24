@@ -5,6 +5,7 @@
 // ADJUST THESE PARAMETERS
 $vacuum_log = 'https://<ip or fqdn of docker host>:<nginxphpport>/vacuum.log';
 $overlay_image = 'floor.png';
+$show_stuck_positions = true;
 $map_width = 1050;
 $map_height = 900;
 $x_offset = 220;
@@ -77,11 +78,11 @@ imagesavealpha($roomba, true);
 foreach($coords as $i => $coord) {
   $split = explode(",", $coord);
   if(sizeof($split)<2) {
-    if($coord == "Stuck") {
+    if(($coord == "Stuck") & ($show_stuck_positions)) {
       $roomba_stuck = imagecreatefrompng('roomba_stuck.png');
       imagealphablending($roomba_stuck, false);
       imagesavealpha($roomba_stuck, true);
-      $roomba_stuck = imagerotate($roomba_stuck, $split[2]*-1, imageColorAllocateAlpha($roomba_stuck, 0, 0, 0, 127));
+      $roomba_stuck = imagerotate($roomba_stuck, $oldtheta*-1, imageColorAllocateAlpha($roomba_stuck, 0, 0, 0, 127));
       imagealphablending($roomba_stuck, false);
       imagesavealpha($roomba_stuck, true);
       imagecopy($image, $roomba_stuck, $oldx-10, $oldy-5, 0, 0, imagesx($roomba_stuck), imagesy($roomba_stuck));
@@ -94,8 +95,9 @@ foreach($coords as $i => $coord) {
   $part = round($part * $i/sizeof($coords));
           
   $color = imagecolorallocate($image, $part, 255, $part);
-  $x = $split[1]+$x_offset; #($split[1]+120)/2;
-  $y = $split[0]+$y_offset; #($split[0]*-1+342)/2;
+  $x = $split[1]+$x_offset;
+  $y = $split[0]+$y_offset;
+  $theta = $split[2];
   
   $boxsize=4;
   $shift_y = 2;
@@ -107,11 +109,8 @@ foreach($coords as $i => $coord) {
   }
   
   if($i+1==sizeof($coords)) {
-    if($coords[$i+1]=="Stuck") {
-      
-    }
-    else {
-      $roomba = imagerotate($roomba, $split[2]*-1, imageColorAllocateAlpha($roomba, 0, 0, 0, 127));
+    if (sizeof($split)>2) {
+      $roomba = imagerotate($roomba, $theta*-1, imageColorAllocateAlpha($roomba, 0, 0, 0, 127));
       imagealphablending($roomba, false);
       imagesavealpha($roomba, true);
       imagecopy($image, $roomba, $x-10, $y-5, 0, 0, imagesx($roomba), imagesy($roomba));
@@ -120,6 +119,7 @@ foreach($coords as $i => $coord) {
   
   $oldx = $x;
   $oldy = $y;
+  $oldtheta = $theta;
 }
 
 if(in_array($lastline, $end)) {
@@ -130,20 +130,18 @@ if(in_array($lastline, $end)) {
     imagealphablending($overlayImage, false);
     imagesavealpha($overlayImage, true);
     $color = imagecolorallocate($image, 0, 149, 223);
-    $finishedRoomba = imagerotate($overlayImage, 180, imageColorAllocateAlpha($overlayImage, 0, 0, 0, 127));
+    $finishedRoomba = imagerotate($overlayImage, $theta*-1, imageColorAllocateAlpha($overlayImage, 0, 0, 0, 127));
     imagelinethick($image, $oldx+($boxsize/2), $oldy+($boxsize/2), $x+($boxsize/2)+3, $y+($boxsize/2)+10, $color, 2);
-    imagecopy($image, $overlayImage, $oldx-10, $oldy-5, 0, 0, imagesx($overlayImage), imagesy($overlayImage));
+    imagecopy($image, $finishedRoomba, $oldx-10, $oldy-5, 0, 0, imagesx($finishedRoomba), imagesy($finishedRoomba));
   }
   else if($lastline == "Finished") {
     $overlayImage = imagecreatefrompng('roomba_charging.png');
     imagealphablending($overlayImage, false);
     imagesavealpha($overlayImage, true);
-    $x; # = (0+120)/2;
-    $y; # = (0*-1+330)/2;
     $color = imagecolorallocate($image, 0, 149, 223);
-    $finishedRoomba = imagerotate($overlayImage, 180, imageColorAllocateAlpha($overlayImage, 0, 0, 0, 127));
+    $finishedRoomba = imagerotate($overlayImage, $theta*-1, imageColorAllocateAlpha($overlayImage, 0, 0, 0, 127));
     imagelinethick($image, $oldx+($boxsize/2), $oldy+($boxsize/2), $x+($boxsize/2)+3, $y+($boxsize/2)+10, $color, 2);
-    imagecopy($image, $finishedRoomba, $x-5, $y+5, 0, 0, imagesx($overlayImage), imagesy($overlayImage));
+    imagecopy($image, $finishedRoomba, $oldx-10, $oldy-5, 0, 0, imagesx($finishedRoomba), imagesy($finishedRoomba));
   }
   
 }
@@ -155,9 +153,11 @@ if($flip_horizontal) {
   imageflip( $image, IMG_FLIP_HORIZONTAL );
 }
 
+$string = "";
+
 if($lastline == "Finished") {
   $finished=true;
-  $status="finished";
+  $status="Finished";
   
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $ha_rest980);
@@ -169,24 +169,23 @@ if($lastline == "Finished") {
   curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
   $server_output = curl_exec ($ch);
   curl_close ($ch);
-  $string = "";
   $data = json_decode($server_output);
   $battery_level = $data->attributes->batPct;
-  $string.="\nBattery: ".$battery_level."%";
+  $string.="\n Battery: ".$battery_level."%";
   
 }
 else if($lastline == "Stuck"){
   $finished=false;
-  $status="stuck";
+  $status="Stuck";
 }
 else {
   $finished=false;
-  $status="running";
+  $status="Running";
 }
 
 date_default_timezone_set($ha_timezone);
 $dt = date('H:i:s Y-m-d', $date);
-$txt = "\nStarted: ".$dt."\n"."Status: ".$status.$string;
+$txt = " Started: ".$dt."\n"." Status: ".$status.$string;
 $white = imagecolorallocate($image, 255, 255, 255);
 $font = "./monaco.ttf"; 
 imagettftext($image, 10, 0, 5, 15, $white, $font, $txt);
