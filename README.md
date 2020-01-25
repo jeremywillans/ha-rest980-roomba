@@ -115,6 +115,8 @@ In the Roomba directory (in HA Configuration), you will need to update the heigh
 
 I have moved these as variables at the top of the file making it easier to update.
 
+You will also need to replace the included floor.png file with an floor plan or similar file which is used as the background for the robot map.
+
 **Note:** Once the vacuum has completed is clean, the image.php file references the latest.png file in the local directory so your changes wont be reflected upon refresh.
 You can use the image-dev.php file as this has been updated to only create an in-memory copy of the map each time its refreshed.
 
