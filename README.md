@@ -94,7 +94,15 @@ I have tried to map as many of the reported statuses, however i occasionally get
 Refer vacuum.yaml
 ```
 
-### Step 6: Configure Lovelace
+### Step 6: Configure Map Options
+
+You will need to update the variables at the top of the image.php and image_dev.php to align with your environment.
+
+Specifically the log, rest980, token and timezone ones should be done now - the rest are best to update once a full clean has run (to populate the map)
+
+You can create the long-lived HA Token from you [HA Account Profile page][profile] page.
+
+### Step 7: Configure Lovelace
 
 I have used the below lovelace configuration with the following HACS components
 
@@ -107,7 +115,7 @@ Note: This config is taken directly from Lovelace Raw Editor as a complete view.
 Refer lovelace.yaml
 ```
 
-### Step 7: Configure Map Options
+### Step 8: Update Map Options
 
 After you have run a clean cycle, the map should be populating however it is unliekly not quite sized correctly.
 
@@ -120,7 +128,7 @@ You will also need to replace the included floor.png file with an floor plan or 
 **Note:** Once the vacuum has completed is clean, the image.php file references the latest.png file in the local directory so your changes wont be reflected upon refresh.
 You can use the image-dev.php file as this has been updated to only create an in-memory copy of the map each time its refreshed.
 
-### Step 8: Enjoy!
+### Step 9: Enjoy!
 
 ## Support
 
@@ -130,3 +138,4 @@ In case you've found a bug, please [open an issue on GitHub][issue].
 
 [forum]: https://community.home-assistant.io/t/irobot-roomba-i7-configuration-using-rest980/161175
 [issue]: https://github.com/jeremywillans/ha-rest9800-roomba/issues
+[profile]: https://www.home-assistant.io/docs/authentication/#your-account-profile
