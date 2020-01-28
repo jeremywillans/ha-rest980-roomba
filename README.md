@@ -100,7 +100,7 @@ You will need to update the variables at the top of the image.php and image_dev.
 
 Specifically the log, rest980, token and timezone ones should be done now - the rest are best to update once a full clean has run (to populate the map)
 
-You can create the long-lived HA Token from you [HA Account Profile page][profile] page.
+You can create the long-lived HA Token from you [HA Account Profile][profile] page.
 
 ### Step 7: Configure Lovelace
 
