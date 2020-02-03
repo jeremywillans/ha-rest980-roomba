@@ -79,6 +79,8 @@ This will create a new local addon which you can install
 
 I split off the ids and regions into the secrets file to make it easier to manage for future updates (as i expect these will change if you update your floorplan from the iRobot app)
 
+You will need to create a folder called vacuum in your HA Config directory, and copy the contents of vacuum folder from my repo - this is used to generate the map.
+
 #### secrets.yaml
 ```
 Refer secrets.yaml
