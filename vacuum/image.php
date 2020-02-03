@@ -3,7 +3,7 @@
 //ini_set('display_errors', 1);
 
 // ADJUST THESE PARAMETERS
-$vacuum_log = 'https://<ip or fqdn of docker host>:<nginxphpport>/vacuum.log';
+$vacuum_log = 'http://<ip or fqdn of docker host>:<nginxphpport>/vacuum.log'; # Could also be HTTPS
 $overlay_image = 'floor.png';
 $show_stuck_positions = true;
 $map_width = 1050;
@@ -12,6 +12,8 @@ $x_offset = 220;
 $y_offset = 220;
 $flip_vertical = false;
 $flip_horizontal = false;
+$rotate_image = true;
+$rotate_degrees = 270;
 $ha_rest980 = 'https://<ip or fqdn of home assistant>:<haport>/api/states/sensor.rest980';
 $ha_token = '<ha_long_live_token>';
 $ha_timezone = 'Australia/Brisbane'; # Supported Timezones https://www.php.net/manual/en/timezones.php
@@ -151,6 +153,10 @@ if($flip_vertical) {
 
 if($flip_horizontal) {
   imageflip( $image, IMG_FLIP_HORIZONTAL );
+}
+
+if($rotate_image) {
+  $image = imagerotate($image, $rotate_degrees, 0);
 }
 
 $string = "";
