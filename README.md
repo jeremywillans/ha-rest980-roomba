@@ -20,6 +20,14 @@ docker run -it node sh -c "npm install -g dorita980 && get-roomba-password <robo
 
 If you dont have direct access to Docker (such as with Hass.io) you can clone and install the dorita980 package locally (requires git and node to be installed) - refer [here](https://github.com/koalazak/dorita980#how-to-get-your-usernameblid-and-password) for instructions
 
+Alternativley, if you are using Hass.io, I have created an Add-on to easily get your BLID and Password.
+
+**HASS.IO ADDON**
+
+- Add the following Github Repository to your Hass.io Add-on Store
+  https://github.com/jeremywillans/hass-addons
+- Locate and Install the roombapw Add-on, following the included instructions.
+
 **Note:** Do not have iRobot App running on your phone when doing this !!!
 
 ### Step 2: Configure Vacuum Map
