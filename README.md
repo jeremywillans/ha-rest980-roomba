@@ -79,9 +79,9 @@ This will create a new local addon which you can install
 * Initiate a Clean Rooms clean from the iRobot App, ensuring you select all **BUT** one room! (if you select them all, it wont list them out. Perform a second clean on the remaining room to get all the details)
 * Navigate to ```http://<ip or fqdn of docker host>:<rest980port>/api/local/info/state```
 * Look for the "lastCommand" section and copy down the following info 
--- pmap_id
--- user_pmapv_id
--- regions (as you selected all the rooms, they should all be listed here)
+    - pmap_id
+    - user_pmapv_id
+    - regions
 
 ### Step 5: Configure Home Assistant Package and Secrets
 
