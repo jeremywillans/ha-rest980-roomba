@@ -168,12 +168,12 @@ input_text:
   vacuum_log:
     name: Vacuum Log Path
     initial: !secret vacuum_log
-  vacuum_floorplan:
+  vacuum_pmap_id":
     name: Floorplan ID
-    initial: !secret vacuum_floorplan
-  vacuum_user_floorplan:
+    initial: !secret vacuum_pmap_id"
+  vacuum_user_pmapv_id:
     name: User Floorplan ID
-    initial: !secret vacuum_user_floorplan
+    initial: !secret vacuum_user_pmapv_id
 
   vacuum_kitchen:
     name: Kitchen
@@ -240,12 +240,12 @@ automation:
           payload: >
             {
               "ordered": 0,
-              "pmap_id": "{{ states('input_text.vacuum_floorplan') | string }}",
+              "pmap_id": "{{ states('input_text.vacuum_pmap_id"') | string }}",
               "regions": [{% for boolean in states.input_boolean if 'vacuum' in boolean.entity_id and is_state(boolean.entity_id, 'on') %}
                 {% set room = 'input_text.' + boolean.entity_id.split('.')[1] %} {{ states(room) | string }} {%- if not loop.last %},{%- endif %}
                 {%- endfor %}
               ],
-              "user_pmapv_id": "{{ states('input_text.vacuum_user_floorplan') | string }}"
+              "user_pmapv_id": "{{ states('input_text.vacuum_user_pmapv_id') | string }}"
             }
       - service: input_boolean.turn_off
         data:
