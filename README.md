@@ -10,7 +10,7 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 
 ## Example Lovelace UI View
 
-![Lovelace Example 1](lovelace_example_1.png)![Lovelace Example 2](lovelace_example_2.png)
+![Lovelace Example](lovelace_example.png)
 
 ## Setup Instructions
 
