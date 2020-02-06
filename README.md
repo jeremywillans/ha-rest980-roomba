@@ -85,22 +85,18 @@ This will create a new local addon which you can install
 
 ### Step 5: Configure Home Assistant Package and Secrets
 
-I split off the ids and regions into the secrets file to make it easier to manage for future updates (as i expect these will change if you update your floorplan from the iRobot app)
-
-You will need to create a folder called vacuum in your HA Config directory, and copy the contents of vacuum folder from my repo - this is used to generate the map.
-
-#### secrets.yaml
-```
-Refer secrets.yaml
-```
-
 The below is my configuration YAML file which uses the [Packages](https://www.home-assistant.io/docs/configuration/packages/) feature in HA to keep all the separate components together.
+
+I split off the ids and regions into the secrets file to make it easier to manage for future updates (as i expect these will change if you update your floorplan from the iRobot app)
 
 I have tried to map as many of the reported statuses, however i occasionally get an "unknown" in the logs, if you work out another state, please post it up!
 
-**Note:** The input_booleans and input_text entries all start with vacuum as this is used in the templates for correct mapping in lovelace
+**Notes:** 
+- Make sure you **remove** any trailing commads from the regions when copying them into the secrets file!
+- The input_booleans and input_text entries all start with vacuum as this is used in the templates for correct mapping in lovelace
 
 ```
+Refer secrets.yaml
 Refer vacuum.yaml
 ```
 
