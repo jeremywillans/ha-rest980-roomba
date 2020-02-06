@@ -4,40 +4,51 @@ Home Assistant - iRobot Roomba i7+ Configuration using rest980
 
 This repository provides configuration to get an iRobot Roomba i7+ robot vacuum cleaner integrated with Home Assistant using the rest980 Docker Image!
 
+[![GH-release](https://img.shields.io/github/v/release/jeremywillans/ha-rest980-roomba.svg?style=flat-square)](https://raw.githubusercontent.com/jeremywillans/ha-rest980-roomba/)
+[![GH-last-commit](https://img.shields.io/github/last-commit/jeremywillans/ha-rest980-roomba.svg?style=flat-square)](https://github.com/jeremywillans/ha-rest980-roomba/commits/master)
+[![GH-code-size](https://img.shields.io/github/languages/code-size/jeremywillans/ha-rest980-roomba.svg?style=flat-square)](https://github.com/jeremywillans/ha-rest980-roomba)
+
 ## Example Lovelace UI View
 
-![Lovelace Example](lovelace_example.png)
+![Lovelace Example 1](lovelace_example_1.png)![Lovelace Example 2](lovelace_example_2.png)
 
-**Special Cheers** 
-- **[Facu ZAK](https://github.com/koalazak)** for creating dorita980 and rest980 !
-- **[gotschi](https://community.home-assistant.io/u/gotschi/summary)** for creating the original Roomba Map PHP file !
+## Setup Instructions
 
-### Step 1: Get Robot Login Details
+### Step 1: Prerequesites
 
+The following custom components are used in this deployment - these can be installed from HACS
+- [roomba-vacuum-card](https://github.com/jeremywillans/lovelace-roomba-vacuum-card) - Custom Plugin Repository
+- [card-mod](https://github.com/thomasloven/lovelace-card-mod)
+- [check-button-card](https://github.com/custom-cards/check-button-card)
+- [lovelace-fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
+
+A working MQTT Server with discovery is also needed (in conjunction with the check-button-card for Maintenance items)
+
+### Step 2: Get Robot Login Details
+
+**NOTE** Do not have iRobot App running on your phone when doing this !!!
+
+**DOCKER**
 ```
 docker run -it node sh -c "npm install -g dorita980 && get-roomba-password <robotIP>"
 ```
-
-If you dont have direct access to Docker (such as with Hass.io) you can clone and install the dorita980 package locally (requires git and node to be installed) - refer [here](https://github.com/koalazak/dorita980#how-to-get-your-usernameblid-and-password) for instructions
-
-Alternativley, if you are using Hass.io, I have created an Add-on to easily get your BLID and Password.
-
-**HASS.IO ADDON**
+**HA ADDON**
 
 - Add the following Github Repository to your Hass.io Add-on Store
   https://github.com/jeremywillans/hass-addons
-- Locate and Install the roombapw Add-on, following the included instructions.
+- Locate and install the roombapw Add-on, following the included instructions.
 
-**Note:** Do not have iRobot App running on your phone when doing this !!!
+**OTHER**
+If you dont have direct access to Docker you can clone and install the dorita980 package locally (requires git and node to be installed) - refer [here](https://github.com/koalazak/dorita980#how-to-get-your-usernameblid-and-password) for instructions
 
-### Step 2: Configure Vacuum Map
+### Step 2: Configure Vacuum Map Directory
 To allow the map to be correctly produced, you will need to create a new vacuum directory. I have chosen to put this inside the HA configuration directory, but you can choose to put this elsewhere and update the configuration accordingly (if you are using HASS and referencing my hass-addons repo, please leave this at the default!)
 
 Copy the contents of the Vacuum directory from Github into this folder.
 
 Note: The image.php file will need updating, but this will be done after the setup is complete.
 
-### Step 3: Configure Docker Compose / Run Image / Hass.io Add-on
+### Step 3: Configure Docker / HA Add-on
 I use docker compose for all my HA related images, but have also listed the docker run command (copied from the rest980 github page)
 I have also included an example PHP Docker Image which i use to host the map.
 
@@ -51,7 +62,6 @@ Refer docker-compose.yaml
 ```
 docker network create docker
 ```
-
 **DOCKER RUN**
 ```
 docker run -e BLID=myuser -e PASSWORD=mypass -e ROBOT_IP=myrobotIP -e FIRMWARE_VERSION=2 -p 3000:3000 koalazak/rest980:latest
@@ -62,7 +72,7 @@ Confirm you can access the WebUI
 ```
 http://<ip or fqdn of docker host>:<port>/api/local/info/state
 ```
-**HASS.IO ADDON**
+**HA ADDON**
 
 - Add the following Github Repository to your Hass.io Add-on Store
   https://github.com/jeremywillans/hass-addons
@@ -85,18 +95,15 @@ This will create a new local addon which you can install
 
 ### Step 5: Configure Home Assistant Package and Secrets
 
-I split off the ids and regions into the secrets file to make it easier to manage for future updates (as i expect these will change if you update your floorplan from the iRobot app)
+I split off the ids and regions into the secrets file to make it easier to manage for future updates (these will change if you update your floorplan from the iRobot app)
 
-You will need to create a folder called vacuum in your HA Config directory, and copy the contents of vacuum folder from my repo - this is used to generate the map.
-
-#### secrets.yaml
 ```
 Refer secrets.yaml
 ```
 
 The below is my configuration YAML file which uses the [Packages](https://www.home-assistant.io/docs/configuration/packages/) feature in HA to keep all the separate components together.
 
-I have tried to map as many of the reported statuses, however i occasionally get an "unknown" in the logs, if you work out another state, please post it up!
+I have tried to map as many of the reported statuses, however I occasionally get an "Unknown" in the logs, if you work out another state, please post it up!
 
 **Note:** The input_booleans and input_text entries all start with vacuum as this is used in the templates for correct mapping in lovelace
 
@@ -114,12 +121,11 @@ You can create the long-lived HA Token from your [HA Account Profile][profile] p
 
 ### Step 7: Configure Lovelace
 
-I have used the below lovelace configuration with the following HACS components
+I have used the below lovelace configuration, ensure the relevant custom components are installed, as listed in the prerequesites section
 
-- lovelace-fold-entity-row
-- button-card
-
-Note: This config is taken directly from Lovelace Raw Editor as a complete view.
+Note: This config is shown as the two cards used
+- Vertical Stack
+- Picture Glance
 
 ```
 Refer lovelace.yaml
@@ -127,9 +133,9 @@ Refer lovelace.yaml
 
 ### Step 8: Update Map Options
 
-After you have run a clean cycle, the map should be populating however it is unliekly not quite sized correctly.
+After you have run a clean cycle, the map should be populating however it is likely not quite sized correctly.
 
-In the Roomba directory (in HA Configuration), you will need to update the height, width, offset and flip options in the image.php file to correctly reflect your layout.
+In the Vacuum directory (in HA Configuration), you will need to update the height, width, offset and flip options in the image.php file to correctly reflect your layout.
 
 I have moved these as variables at the top of the file making it easier to update.
 
@@ -149,3 +155,22 @@ In case you've found a bug, please [open an issue on GitHub][issue].
 [forum]: https://community.home-assistant.io/t/irobot-roomba-i7-configuration-using-rest980/161175
 [issue]: https://github.com/jeremywillans/ha-rest9800-roomba/issues
 [profile]: https://www.home-assistant.io/docs/authentication/#your-account-profile
+
+## Disclaimer
+
+This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the iRobot Corporation,
+or any of its subsidiaries or its affiliates. The official iRobot website can be found at https://www.irobot.com
+
+## Credits
+
+- [Facu ZAK](https://github.com/koalazak) for creating dorita980 and rest980 !
+- [gotschi](https://community.home-assistant.io/u/gotschi/summary) for creating the original Roomba Map PHP file !
+- [Ben Tomlin](https://github.com/benct) for creating the [xiaomi-vacuum-card](https://github.com/benct/lovelace-xiaomi-vacuum-card) from which my [roomba-vacuum-card](https://github.com/jeremywillans/lovelace-roomba-vacuum-card) is shamelessly derived from!
+
+## My Repos
+
+[ha-rest980-roomba](https://github.com/jeremywillans/ha-rest980-roomba) | 
+[roomba-vacuum-card](https://github.com/jeremywillans/lovelace-roomba-vacuum-card) | 
+[hass-addons](https://github.com/jeremywillans/hass-addons) | 
+
+[![BMC](https://www.buymeacoffee.com/assets/img/custom_images/white_img.png)](https://www.buymeacoffee.com/jeremywillans)

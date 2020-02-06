@@ -1,134 +1,149 @@
-  - badges: []
-    cards:
-      - entities:
-          - entity: sensor.vacuum_phase
-          - entity: sensor.vacuum_cycle
-          - entity: sensor.vacuum_battery
-          - entity: sensor.vacuum_bin
-          - entity: sensor.vacuum_dock
-          - entity: sensor.vacuum_location
-          - entities:
-              - input_boolean.vacuum_kitchen
-              - input_boolean.vacuum_entry
-              - input_boolean.vacuum_hall
-              - input_boolean.vacuum_living_room
-              - input_boolean.vacuum_bathroom
-              - input_boolean.vacuum_bedroom
-              - input_boolean.vacuum_wardrobe
-              - input_boolean.vacuum_master_ensuite
-              - input_boolean.vacuum_master_bedroom
-              - input_boolean.vacuum_table
-              - entity: automation.vacuum_clean_rooms
-                lock:
-                  enabled: |
-                    [[[
-                      if (states['group.vacuum_rooms'].state == "off")
-                        return true;
-                      return false;
-                    ]]]
-                  exemptions: []
-                name: Clean Rooms
-                styles:
-                  card:
-                    - height: 50px
-                tap_action:
-                  action: call-service
-                  service: automation.trigger
-                  service_data:
-                    entity_id: automation.vacuum_clean_rooms
-                type: 'custom:button-card'
-            head:
-              label: Selective Room Cleaning
-              type: section
-            type: 'custom:fold-entity-row'
-        show_header_toggle: false
-        type: entities
-      - cards:
-          - entity: rest_command.vacuum_action
-            icon: |
-              [[[
-                if (states['sensor.vacuum_cycle'].state == "Ready")
-                  return "mdi:play";
-                else if ((states['sensor.vacuum_phase'].state == "Stopped/Paused") || (states['sensor.vacuum_phase'].state == "Stuck") || (states['sensor.vacuum_phase'].state == "Charging"))
-                  return "mdi:play-pause";
-                return "mdi:pause"
-              ]]]
-            layout: icon_name
-            lock:
-              enabled: |
-                [[[
-                  if (states['sensor.vacuum_phase'].state == "Emptying Robot")
-                    return true;
-                  return false;
-                ]]]
-              exemptions: []
-            name: |
-              [[[
-                if (states['sensor.vacuum_cycle'].state == "Ready")
-                  return "Full Clean";
-                else if ((states['sensor.vacuum_phase'].state == "Stopped/Paused") || (states['sensor.vacuum_phase'].state == "Stuck") || (states['sensor.vacuum_phase'].state == "Charging"))
-                  return "Resume";
-                return "Pause"
-              ]]]
-            styles:
-              card:
-                - height: 50px
-            tap_action:
-              action: call-service
-              service: rest_command.vacuum_action
-              service_data:
-                command: |
-                  [[[
-                    if (states['sensor.vacuum_cycle'].state == "Ready")
-                      return "start";
-                    else if ((states['sensor.vacuum_phase'].state == "Stopped/Paused") || (states['sensor.vacuum_phase'].state == "Stuck") || (states['sensor.vacuum_phase'].state == "Charging"))
-                      return "resume";
-                    return "pause"
-                  ]]]
-            hold_action:
-              action: call-service
-              service: rest_command.vacuum_action
-              service_data:
-                command: |
-                  [[[
-                    if (states['sensor.vacuum_cycle'].state == "Ready")
-                      return "start";
-                    else if ((states['sensor.vacuum_phase'].state == "Stopped/Paused") || (states['sensor.vacuum_phase'].state == "Stuck") || (states['sensor.vacuum_phase'].state == "Charging"))
-                      return "stop";
-                    return "stop"
-                  ]]]
-            type: 'custom:button-card'
-          - entity: rest_command.vacuum_action
-            icon: 'mdi:home-minus'
-            layout: icon_name
-            lock:
-              enabled: |
-                [[[
-                  if (states['sensor.vacuum_phase'].state == "Emptying Robot")
-                    return true;
-                  return false;
-                ]]]
-              exemptions: []
-            name: |
-              [[[
-                if ((states['sensor.vacuum_phase'].state == "Charging") || (states['sensor.vacuum_phase'].state == "Fully Charged") || (states['sensor.vacuum_phase'].state == "Emptying Robot"))
-                  return "Empty Bin";
-                return "Dock"
-              ]]]
-            styles:
-              card:
-                - height: 50px
-            tap_action:
-              action: call-service
-              service: rest_command.vacuum_action
-              service_data:
-                command: dock
-            type: 'custom:button-card'
-        type: horizontal-stack
-      - aspect_ratio: 0%
-        camera_image: camera.roomba
-        entities: []
-        type: picture-glance
-    icon: 'mdi:robot-vacuum'
-    path: vacuum
-    title: Vacuum
+### VERTICAL STACK CARD ###
+cards:
+  - entity: sensor.vacuum
+    type: 'custom:roomba-vacuum-card'
+  - entities:
+      - input_boolean.vacuum_clean_kitchen
+      - input_boolean.vacuum_clean_entry
+      - input_boolean.vacuum_clean_hall
+      - input_boolean.vacuum_clean_living_room
+      - input_boolean.vacuum_clean_bathroom
+      - input_boolean.vacuum_clean_bedroom
+      - input_boolean.vacuum_clean_wardrobe
+      - input_boolean.vacuum_clean_master_ensuite
+      - input_boolean.vacuum_clean_master_bedroom
+      - input_boolean.vacuum_clean_table
+      - entity: automation.vacuum_clean_rooms
+        lock:
+          enabled: |
+            [[[
+              if (states['group.vacuum_rooms'].state == "off")
+                return true;
+              return false;
+            ]]]
+          exemptions: []
+        name: Clean Rooms
+        styles:
+          card:
+            - height: 50px
+        tap_action:
+          action: call-service
+          service: automation.trigger
+          service_data:
+            entity_id: automation.vacuum_clean_rooms
+        type: 'custom:button-card'
+    head:
+      label: Selective Room Cleaning
+      type: section
+    type: 'custom:fold-entity-row'
+  - entities:
+      - style: |-
+          .text-divider {
+            padding: 0em;
+            margin: 0em;
+          } h2 {
+            font-size: 1em;
+            margin-block-start: 0em;
+            margin-block-end: 0em;
+          }
+        text: Clean
+        type: 'custom:text-divider-row'
+      - entity: sensor.vacuum_maint_clean_brushes
+        severity:
+          - hue: '140'
+            value: 8 days
+          - hue: '55'
+            value: 10 days
+          - hue: '345'
+            value: 14 days
+        title: Brushes
+        type: 'custom:check-button-card'
+        visibility_timeout: 10 days
+      - entity: sensor.vacuum_maint_clean_contacts
+        severity:
+          - hue: '140'
+            value: 30 days
+          - hue: '55'
+            value: 40 days
+          - hue: '345'
+            value: 50 days
+        title: Contacts
+        type: 'custom:check-button-card'
+        visibility_timeout: 40 days
+      - entity: sensor.vacuum_maint_clean_filter
+        severity:
+          - hue: '140'
+            value: 8 days
+          - hue: '55'
+            value: 10 days
+          - hue: '345'
+            value: 14 days
+        title: Filter
+        type: 'custom:check-button-card'
+        visibility_timeout: 10 days
+      - entity: sensor.vacuum_maint_clean_wheel
+        severity:
+          - hue: '140'
+            value: 15 days
+          - hue: '55'
+            value: 18 days
+          - hue: '345'
+            value: 21 days
+        title: Clean Wheel
+        type: 'custom:check-button-card'
+        visibility_timeout: 18 days
+      - style: |-
+          .text-divider {
+            padding: 0em;
+            margin: 0em;
+          } h2 {
+            font-size: 1em;
+            margin-block-start: 0em;
+            margin-block-end: 0em;
+          }
+        text: Replace
+        type: 'custom:text-divider-row'
+      - entity: sensor.vacuum_maint_replace_brushes
+        severity:
+          - hue: '140'
+            value: 6 months
+          - hue: '55'
+            value: 8 months
+          - hue: '345'
+            value: 12 months
+        title: Brushes
+        type: 'custom:check-button-card'
+        visibility_timeout: 8 months
+      - entity: sensor.vacuum_maint_replace_filter
+        severity:
+          - hue: '140'
+            value: 2 months
+          - hue: '55'
+            value: 3 months
+          - hue: '345'
+            value: 4 months
+        title: Filter
+        type: 'custom:check-button-card'
+        visibility_timeout: 3 months
+      - entity: sensor.vacuum_maint_replace_wheel
+        severity:
+          - hue: '140'
+            value: 12 months
+          - hue: '55'
+            value: 14 months
+          - hue: '345'
+            value: 18 months
+        title: Wheel
+        type: 'custom:check-button-card'
+        visibility_timeout: 14 months
+    head:
+      label: Maintenance
+      type: section
+    type: 'custom:fold-entity-row'
+type: vertical-stack
+
+### PICTURE GLANCE CARD ###
+aspect_ratio: 0%
+camera_image: camera.roomba
+entities: []
+type: picture-glance
