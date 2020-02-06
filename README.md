@@ -21,6 +21,7 @@ The following custom components are used in this deployment - these can be insta
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod)
 - [check-button-card](https://github.com/custom-cards/check-button-card)
 - [lovelace-fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
+- [text-divider-row](https://github.com/custom-cards/text-divider-row/)
 
 A working MQTT Server with discovery is also needed (in conjunction with the check-button-card for Maintenance items)
 
