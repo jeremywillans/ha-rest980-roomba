@@ -19,8 +19,7 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 The following custom components are used in this deployment - these can be installed from HACS
 - [roomba-vacuum-card](https://github.com/jeremywillans/lovelace-roomba-vacuum-card) - Custom Plugin Repository
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod)
-- [check-button-card](https://github.com/custom-cards/check-button-card)
-  **NOTE** Currently need to use my custom version [e80ef56] (Custom Plugin Repository https://github.com/jeremywillans/check-button-card)
+- [check-button-card](https://github.com/custom-cards/check-button-card) - **NOTE** Currently need to use my forked version until PR is merged (Custom Plugin Repository https://github.com/jeremywillans/check-button-card, build e80ef56)
 - [lovelace-fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
 - [text-divider-row](https://github.com/custom-cards/text-divider-row/)
 
