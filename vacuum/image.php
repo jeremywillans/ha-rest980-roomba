@@ -18,7 +18,7 @@ $ha_rest980 = 'https://<ip or fqdn of home assistant>:<haport>/api/states/sensor
 $ha_token = '<ha_long_live_token>';
 $ha_timezone = 'Australia/Brisbane'; # Supported Timezones https://www.php.net/manual/en/timezones.php
 //
-// COLOR CAN BE EDITED ON LINE 113
+// COLOR CAN BE EDITED ON LINE 109
 //
 /////////////////
 
@@ -166,14 +166,15 @@ if($flip_horizontal) {
 }
 
 if($rotate_image) {
-  $image = imagerotate($image, $rotate_degrees, 0);
+  $transparent = imagecolorallocatealpha($image, 0, 0, 0, 127);
+  $image = imagerotate($image, $rotate_degrees, $transparent, 1);
 }
 
 $dest = imagecreatetruecolor($map_width,$map_height);
 imagesavealpha($dest, true);
 $overlayImage = imagecreatefrompng($overlay_image);
 imagecopy($dest, $overlayImage, 0, 0, 0, 0, imagesx($overlayImage), imagesy($overlayImage));
-imagecopy($dest, $image, 0, 0, 0, 0, imagesx($overlayImage), imagesy($overlayImage));
+imagecopy($dest, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
 imagedestroy($overlayImage);
 
 $string = "";
