@@ -141,10 +141,32 @@ I have moved these as variables at the top of the file making it easier to updat
 
 You will also need to replace the included floor.png file with an floor plan or similar file which is used as the background for the robot map.
 
-**Note:** Once the vacuum has completed is clean, the image.php file references the latest.png file in the local directory so your changes wont be reflected upon refresh.
-You can use the image-dev.php file as this has been updated to only create an in-memory copy of the map each time its refreshed.
+**Note:** Once the vacuum has completed is clean, the image.php file references the latest.png file in the local vacuum directory so your changes wont be reflected upon refresh.
+Simply delete the "latest.png" file in the vacuum directory to force map regeneration each time (or run http://<ip or fqdn of docker host>:<nginxphpport>/image.phpclear=true```)
 
-### Step 9: Enjoy!
+### Step 9: Create Vacuum Maintenace Sensors
+
+You will need to create the Maintenance Sensors - simply expand the Maintenance dropdown in Lovelace and click the green check next to each item to create these.
+
+**Note:** check-button-card is assuming you have [MQTT Discovery](https://www.home-assistant.io/docs/mqtt/discovery/) enabled using the default discovery prefix of "homeassistant"
+If you have a different discovery prefix defined - such as "smartthings" - please add the following to each of the Maintenance Tasks in Lovelace
+
+```
+- entity: sensor.vacuum_maint_clean_brushes
+  severity:
+   - hue: '140'
+     value: 8 days
+   - hue: '55'
+     value: 10 days
+   - hue: '345'
+     value: 14 days
+   title: Brushes
+   type: 'custom:check-button-card'
+   discovery_prefix: smartthings <--------------- THIS
+   visibility_timeout: 10 days
+```
+
+### Step 10: Enjoy!
 
 ## Support
 
@@ -171,6 +193,6 @@ or any of its subsidiaries or its affiliates. The official iRobot website can be
 
 [ha-rest980-roomba](https://github.com/jeremywillans/ha-rest980-roomba) | 
 [roomba-vacuum-card](https://github.com/jeremywillans/lovelace-roomba-vacuum-card) | 
-[hass-addons](https://github.com/jeremywillans/hass-addons) | 
+[hass-addons](https://github.com/jeremywillans/hass-addons)
 
 [![BMC](https://www.buymeacoffee.com/assets/img/custom_images/white_img.png)](https://www.buymeacoffee.com/jeremywillans)
