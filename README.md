@@ -4,9 +4,9 @@ Home Assistant - iRobot Roomba i7+ Configuration using rest980
 
 This repository provides configuration to get an iRobot Roomba i7+ robot vacuum cleaner integrated with Home Assistant using the rest980 Docker Image!
 
-[![GH-release](https://img.shields.io/github/v/release/jeremywillans/ha-rest980-roomba.svg?style=flat-square)](https://raw.githubusercontent.com/jeremywillans/ha-rest980-roomba/)
-[![GH-last-commit](https://img.shields.io/github/last-commit/jeremywillans/ha-rest980-roomba.svg?style=flat-square)](https://github.com/jeremywillans/ha-rest980-roomba/commits/master)
-[![GH-code-size](https://img.shields.io/github/languages/code-size/jeremywillans/ha-rest980-roomba.svg?style=flat-square)](https://github.com/jeremywillans/ha-rest980-roomba)
+[![GH-release](https://img.shields.io/github/v/release/jeremywillans/ha-rest980-roomba.svg?style=for-the-badge)](https://raw.githubusercontent.com/jeremywillans/ha-rest980-roomba/)
+[![GH-last-commit](https://img.shields.io/github/last-commit/jeremywillans/ha-rest980-roomba.svg?style=for-the-badge)](https://github.com/jeremywillans/ha-rest980-roomba/commits/master)
+[![GH-code-size](https://img.shields.io/github/languages/code-size/jeremywillans/ha-rest980-roomba.svg?style=for-the-badge)](https://github.com/jeremywillans/ha-rest980-roomba)
 
 ## Example Lovelace UI View
 
