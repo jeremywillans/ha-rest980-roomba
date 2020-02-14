@@ -38,7 +38,7 @@ sensor:
             'train' : 'Train',
             'none' : 'Ready' } %}
           {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')["cycle"] %}
-          {{ mapper[state] if state in mapper else 'Unknown' }}
+          {{ mapper[state] if state in mapper else state }}
         icon_template: mdi:robot-vacuum
         attribute_templates:
           battery: >-
@@ -59,14 +59,14 @@ sensor:
               'hmMidMsn' : 'Mid Dock',
               'hmPostMsn' : 'Final Dock' } %}
             {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')["phase"] %}
-            {{ mapper[state] if state in mapper else 'Unknown' }}
+            {{ mapper[state] if state in mapper else state }}
             {% endif %}
           bin: >-
             {% set mapper =  {
               true : 'Full',
               false : 'Not Full' } %}
             {% set state =  state_attr('sensor.rest980', 'bin')["full"] %}
-            {{ mapper[state] if state in mapper else 'Unknown' }}
+            {{ mapper[state] if state in mapper else state }}
           clean_base: >-
             {% set mapper =  {
               300 : 'Ready',
@@ -76,7 +76,7 @@ sensor:
               351 : 'Clogged',
               353 : 'Bag Full' } %}
             {% set state =  state_attr('sensor.rest980', 'dock')["state"] %}
-            {{ mapper[state] if state in mapper else 'Unknown' }}
+            {{ mapper[state] if state in mapper else state }}
           location: >-
             {% if state_attr('sensor.rest980', 'pose')['theta'] is defined %}
               ({{ state_attr('sensor.rest980', 'pose')['point']['x'] }}, {{ state_attr('sensor.rest980', 'pose')['point']['y'] }}, {{ state_attr('sensor.rest980', 'pose')['theta'] }})
