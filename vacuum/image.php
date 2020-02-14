@@ -17,6 +17,9 @@ $rotate_degrees = 270;
 $ha_rest980 = 'https://<ip or fqdn of home assistant>:<haport>/api/states/sensor.rest980';
 $ha_token = '<ha_long_live_token>';
 $ha_timezone = 'Australia/Brisbane'; # Supported Timezones https://www.php.net/manual/en/timezones.php
+//
+// COLOR CAN BE EDITED ON LINE 109
+//
 /////////////////
 
 if(isset($_GET['clear'])) {
@@ -69,10 +72,6 @@ imagesavealpha($image, true);
 $black = imagecolorallocatealpha($image,0,0,0, 127);
 imagefill($image,0,0,$black);
 
-$overlayImage = imagecreatefrompng($overlay_image);
-imagecopy($image, $overlayImage, 0, 0, 0, 0, imagesx($overlayImage), imagesy($overlayImage));
-imagedestroy($overlayImage);
-
 $roomba = imagecreatefrompng('roomba.png');
 imagealphablending($roomba, false);
 imagesavealpha($roomba, true);
@@ -96,6 +95,17 @@ foreach($coords as $i => $coord) {
   $part= hexdec("ff");
   $part = round($part * $i/sizeof($coords));
           
+  // EDIT BELOW LINE TO MODIFY THE COLOR USED
+  //
+  // imagecolorallocate($image, red, green, blue)
+  //
+  // $part represents gradual increase from 0 to 255 based on number of logged locations
+  //
+  // Examples - 
+  // imagecolorallocate($image, $part, 255, $part);  - Green to White Fade
+  // imagecolorallocate($image, 0, $part, 255);      - Blue to Aqua Fade
+  // imagecolorallocate($image, $part, 0, 255);      - Blue to Pink Fade
+  //
   $color = imagecolorallocate($image, $part, 255, $part);
   $x = $split[1]+$x_offset;
   $y = $split[0]+$y_offset;
@@ -156,8 +166,16 @@ if($flip_horizontal) {
 }
 
 if($rotate_image) {
-  $image = imagerotate($image, $rotate_degrees, 0);
+  $transparent = imagecolorallocatealpha($image, 0, 0, 0, 127);
+  $image = imagerotate($image, $rotate_degrees, $transparent, 1);
 }
+
+$dest = imagecreatetruecolor($map_width,$map_height);
+imagesavealpha($dest, true);
+$overlayImage = imagecreatefrompng($overlay_image);
+imagecopy($dest, $overlayImage, 0, 0, 0, 0, imagesx($overlayImage), imagesy($overlayImage));
+imagecopy($dest, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
+imagedestroy($overlayImage);
 
 $string = "";
 
@@ -192,17 +210,17 @@ else {
 date_default_timezone_set($ha_timezone);
 $dt = date('H:i:s Y-m-d', $date);
 $txt = " Started: ".$dt."\n"." Status: ".$status.$string;
-$white = imagecolorallocate($image, 255, 255, 255);
+$white = imagecolorallocate($dest, 255, 255, 255);
 $font = "./monaco.ttf"; 
-imagettftext($image, 10, 0, 5, 15, $white, $font, $txt);
+imagettftext($dest, 10, 0, 5, 15, $white, $font, $txt);
 
 header("Content-Type: image/png");
-imagepng($image);
+imagepng($dest);
 if(isset($_GET['last'])) {
-  imagepng($image, "latest.png");
-  imagepng($image, $date.".png");
+  imagepng($dest, "latest.png");
+  imagepng($dest, $date.".png");
 }
-imagedestroy($image);
+imagedestroy($dest);
 imagedestroy($roomba);
 imagedestroy($roomba_stuck);
 imagedestroy($overlayImage);
