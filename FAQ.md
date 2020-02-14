@@ -1,8 +1,10 @@
 # ha-rest980-roomba FAQ
 
-Home Assistant - iRobot Roomba i7+ Configuration using rest980
-
 **Frequently Asked Questions**
+
+I have compiled these questions from reviewing the HA Forum thread.. hopefully this should be a starting point if you encounter issues getting this running
+
+Please let me know if you think anything else should be added to this list!
 
 ### 1. BLID/Password Issues
 
@@ -45,10 +47,10 @@ If you use a different discovery prefix defined - such as "smartthings" - you wi
      value: 10 days
    - hue: '345'
      value: 14 days
-   title: Brushes
-   type: 'custom:check-button-card'
-   discovery_prefix: smartthings     <-- ADD THIS ENTRY
-   visibility_timeout: 10 days
+  title: Brushes
+  type: 'custom:check-button-card'
+  discovery_prefix: smartthings     <-- ADD THIS ENTRY
+  visibility_timeout: 10 days
 ```
 
 ### 5. The Maintenance Icon on the Card does not reflect correctly
@@ -60,8 +62,11 @@ The Custom Roomba Card Maintnance icon (top right corner) uses the maint_due att
 
 **Note:** The oroginal chec-button-card does not have the visibility_timestamp value, you need to use my [forked version](https://github.com/jeremywillans/check-button-card) until the PR is merged.
 
+### 6. The Map is not updating
 
-Please let me know if you think anything else should be added to this list!
+The Automations for Roomba Location updating and Map Generation is expecting a Status of 'Clean', this is achieved in the vacuum.yaml file by  mapping the underlying vacuum cycle to reflect this, if you find that you status does not match this (for example the Roomba980 uses a mode of 'quick' which has since been incorporated), changes to the vacuum.yaml are needed to add this.
+
+If you do encounter this - please let me know so I can update GH!
 
 ## Support
 
