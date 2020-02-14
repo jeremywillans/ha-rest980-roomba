@@ -42,14 +42,14 @@ docker run -it node sh -c "npm install -g dorita980 && get-roomba-password <robo
 **OTHER**
 If you dont have direct access to Docker you can clone and install the dorita980 package locally (requires git and node to be installed) - refer [here](https://github.com/koalazak/dorita980#how-to-get-your-usernameblid-and-password) for instructions
 
-### Step 2: Configure Vacuum Map Directory
+### Step 3: Configure Vacuum Map Directory
 To allow the map to be correctly produced, you will need to create a new vacuum directory. I have chosen to put this inside the HA configuration directory, but you can choose to put this elsewhere and update the configuration accordingly (if you are using HASS and referencing my hass-addons repo, please leave this at the default!)
 
 Copy the contents of the Vacuum directory from Github into this folder.
 
 Note: The image.php file will need updating, but this will be done after the setup is complete.
 
-### Step 3: Configure Docker / HA Add-on
+### Step 4: Configure Docker / HA Add-on
 I use docker compose for all my HA related images, but have also listed the docker run command (copied from the rest980 github page)
 I have also included an example PHP Docker Image which i use to host the map.
 
@@ -85,7 +85,7 @@ http://<ip or fqdn of docker host>:<port>/api/local/info/state
 
 This will create a new local addon which you can install
 
-### Step 4: Get Room Details
+### Step 5: Get Room Details
 
 * Initiate a Clean Rooms clean from the iRobot App, ensuring you select all **BUT** one room! (if you select them all, it wont list them out. Perform a second clean on the remaining room to get all the details)
 * Navigate to ```http://<ip or fqdn of docker host>:<rest980port>/api/local/info/state```
@@ -94,7 +94,7 @@ This will create a new local addon which you can install
     - user_pmapv_id
     - regions
 
-### Step 5: Configure Home Assistant Package and Secrets
+### Step 6: Configure Home Assistant Package and Secrets
 
 The below is my configuration YAML file which uses the [Packages](https://www.home-assistant.io/docs/configuration/packages/) feature in HA to keep all the separate components together.
 
@@ -111,7 +111,7 @@ Refer secrets.yaml
 Refer vacuum.yaml
 ```
 
-### Step 6: Configure Map Options
+### Step 7: Configure Map Options
 
 You will need to update the variables at the top of the image.php and image_dev.php to align with your environment.
 
@@ -119,7 +119,7 @@ Specifically the log, rest980, token and timezone ones should be done now - the 
 
 You can create the long-lived HA Token from your [HA Account Profile][profile] page.
 
-### Step 7: Configure Lovelace
+### Step 8: Configure Lovelace
 
 I have used the below lovelace configuration, ensure the relevant custom components are installed, as listed in the prerequesites section
 
@@ -131,7 +131,7 @@ Note: This config is shown as the two cards used
 Refer lovelace.yaml
 ```
 
-### Step 8: Update Map Options
+### Step 9: Update Map Options
 
 After you have run a clean cycle, the map should be populating however it is likely not quite sized correctly.
 
@@ -144,7 +144,7 @@ You will also need to replace the included floor.png file with an floor plan or 
 **Note:** Once the vacuum has completed is clean, the image.php file references the latest.png file in the local vacuum directory so your changes wont be reflected upon refresh.
 Simply delete the "latest.png" file in the vacuum directory to force map regeneration each time (or run http://<ip or fqdn of docker host>:<nginxphpport>/image.phpclear=true```)
 
-### Step 9: Create Vacuum Maintenace Sensors
+### Step 10: Create Vacuum Maintenace Sensors
 
 You will need to create the Maintenance Sensors - simply expand the Maintenance dropdown in Lovelace and click the green check next to each item to create these.
 
@@ -166,7 +166,7 @@ If you have a different discovery prefix defined - such as "smartthings" - pleas
   visibility_timeout: 10 days
 ```
 
-### Step 10: Enjoy!
+### Step 11: Enjoy!
 
 ## Support
 
