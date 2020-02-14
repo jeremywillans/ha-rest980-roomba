@@ -170,6 +170,8 @@ If you have a different discovery prefix defined - such as "smartthings" - pleas
 
 ## Support
 
+Check the FAQ [here](https://github.com/jeremywillans/ha-rest980-roomba/FAQ.md)!
+
 Got questions? Please post them [here][forum].
 
 In case you've found a bug, please [open an issue on GitHub][issue].
