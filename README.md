@@ -160,10 +160,10 @@ If you have a different discovery prefix defined - such as "smartthings" - pleas
      value: 10 days
    - hue: '345'
      value: 14 days
-   title: Brushes
-   type: 'custom:check-button-card'
-   discovery_prefix: smartthings <--------------- THIS
-   visibility_timeout: 10 days
+  title: Brushes
+  type: 'custom:check-button-card'
+  discovery_prefix: smartthings <--------------- THIS
+  visibility_timeout: 10 days
 ```
 
 ### Step 10: Enjoy!
