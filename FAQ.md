@@ -14,7 +14,7 @@ You are essentially using roombapw to 'pair' as an additional device to your roo
 
 **Notes**
 - Dont have the iRobot App running when doing this!
-- Hold the Clean button for two seconds when starting the pair process
+- Hold the Home button for two seconds when starting the pair process
 
 ### 2. Selective Cleaning isnt working
 
