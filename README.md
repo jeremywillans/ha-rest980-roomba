@@ -4,9 +4,8 @@ Home Assistant - iRobot Roomba i7+ Configuration using rest980
 
 This repository provides configuration to get an iRobot Roomba i7+ robot vacuum cleaner integrated with Home Assistant using the rest980 Docker Image!
 
-[![GH-release](https://img.shields.io/github/v/release/jeremywillans/ha-rest980-roomba.svg?style=for-the-badge)](https://raw.githubusercontent.com/jeremywillans/ha-rest980-roomba/)
-[![GH-last-commit](https://img.shields.io/github/last-commit/jeremywillans/ha-rest980-roomba.svg?style=for-the-badge)](https://github.com/jeremywillans/ha-rest980-roomba/commits/master)
-[![GH-code-size](https://img.shields.io/github/languages/code-size/jeremywillans/ha-rest980-roomba.svg?style=for-the-badge)](https://github.com/jeremywillans/ha-rest980-roomba)
+[![gh_release]](../../releases)
+[![gh_last_commit]](../../commits/master)
 
 ## Example Lovelace UI View
 
@@ -17,7 +16,7 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 ### Step 1: Prerequesites
 
 The following custom components are used in this deployment - these can be installed from HACS
-- [roomba-vacuum-card](https://github.com/jeremywillans/lovelace-roomba-vacuum-card) - Custom Plugin Repository
+- [roomba-vacuum-card] - Custom Plugin Repository
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod)
 - [check-button-card](https://github.com/custom-cards/check-button-card) - **NOTE** Currently need to use my forked version until PR is merged (Custom Plugin Repository https://github.com/jeremywillans/check-button-card, build e80ef56)
 - [lovelace-fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
@@ -35,7 +34,7 @@ docker run -it node sh -c "npm install -g dorita980 && get-roomba-password <robo
 ```
 **HA ADDON**
 
-- Add the following Github Repository to your Hass.io Add-on Store
+- Add the following Github Repository to your HA Add-on Store
   https://github.com/jeremywillans/hass-addons
 - Locate and install the roombapw Add-on, following the included instructions.
 
@@ -75,7 +74,7 @@ http://<ip or fqdn of docker host>:<port>/api/local/info/state
 ```
 **HA ADDON**
 
-- Add the following Github Repository to your Hass.io Add-on Store
+- Add the following Github Repository to your HA Add-on Store
   https://github.com/jeremywillans/hass-addons
 - Install the rest980 addon, then update and save the configuration options 
 - Install and configure the php-nginx addon.
@@ -170,15 +169,11 @@ If you have a different discovery prefix defined - such as "smartthings" - pleas
 
 ## Support
 
-Check the FAQ [here](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/FAQ.md)!
+Check the FAQ [here][faq]!
 
 Got questions? Please post them [here][forum].
 
-In case you've found a bug, please [open an issue on GitHub][issue].
-
-[forum]: https://community.home-assistant.io/t/irobot-roomba-i7-configuration-using-rest980/161175
-[issue]: https://github.com/jeremywillans/ha-rest9800-roomba/issues
-[profile]: https://www.home-assistant.io/docs/authentication/#your-account-profile
+In case you've found a bug, please [open an issue on GitHub](../../issues).
 
 ## Disclaimer
 
@@ -187,14 +182,39 @@ or any of its subsidiaries or its affiliates. The official iRobot website can be
 
 ## Credits
 
-- [Facu ZAK](https://github.com/koalazak) for creating dorita980 and rest980 !
-- [gotschi](https://community.home-assistant.io/u/gotschi/summary) for creating the original Roomba Map PHP file !
-- [Ben Tomlin](https://github.com/benct) for creating the [xiaomi-vacuum-card](https://github.com/benct/lovelace-xiaomi-vacuum-card) from which my [roomba-vacuum-card](https://github.com/jeremywillans/lovelace-roomba-vacuum-card) is shamelessly derived from!
+- [Facu ZAK][facuzak] for creating dorita980 and rest980 !
+- [gotschi] for creating the original Roomba Map PHP file !
+- [Ben Tomlin][benct] for creating the [xiaomi-vacuum-card] from which my [roomba-vacuum-card] is shamelessly derived from!
 
 ## My Repos
 
-[ha-rest980-roomba](https://github.com/jeremywillans/ha-rest980-roomba) | 
-[roomba-vacuum-card](https://github.com/jeremywillans/lovelace-roomba-vacuum-card) | 
-[hass-addons](https://github.com/jeremywillans/hass-addons)
+[ha-rest980-roomba] | 
+[roomba-vacuum-card] | 
+[hass-addons] | 
+[event-emitter]
 
-[![BMC](https://www.buymeacoffee.com/assets/img/custom_images/white_img.png)](https://www.buymeacoffee.com/jeremywillans)
+[![BMC]](https://www.buymeacoffee.com/jeremywillans)
+
+
+[gh_release]: https://img.shields.io/github/v/release/jeremywillans/ha-rest980-roomba.svg?style=for-the-badge
+[gh_last_commit]: https://img.shields.io/github/last-commit/jeremywillans/ha-rest980-roomba.svg?style=for-the-badge
+
+[forum]: https://community.home-assistant.io/t/irobot-roomba-i7-configuration-using-rest980/161175
+[issue]: https://github.com/jeremywillans/ha-rest980-roomba/issues
+[faq]: https://github.com/jeremywillans/ha-rest980-roomba/blob/master/FAQ.md
+[profile]: https://www.home-assistant.io/docs/authentication/#your-account-profile
+
+[facuzak]: https://github.com/koalazak
+[rest980]: https://github.com/koalazak/rest980
+[dorita980]: https://github.com/koalazak/rest980
+[gotschi]: https://community.home-assistant.io/u/gotschi/summary
+[benct]: https://github.com/benct
+[xiaomi-vacuum-card]: https://github.com/benct/lovelace-xiaomi-vacuum-card
+
+[ha-rest980-roomba]: https://github.com/jeremywillans/ha-rest980-roomba
+[roomba-vacuum-card]: https://github.com/jeremywillans/lovelace-roomba-vacuum-card
+[hass-addons]: https://github.com/jeremywillans/hass-addons
+[event-emitter]: https://github.com/jeremywillans/event-emitter
+[BMC]: https://www.buymeacoffee.com/assets/img/custom_images/white_img.png
+
+[forum]: https://community.home-assistant.io/t/irobot-roomba-i7-configuration-using-rest980/161175
