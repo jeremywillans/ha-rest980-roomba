@@ -1,7 +1,5 @@
 # ha-rest980-roomba FAQ
 
-Home Assistant - iRobot Roomba i7+ Configuration using rest980
-
 **Frequently Asked Questions**
 
 ### 1. BLID/Password Issues
