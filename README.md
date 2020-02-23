@@ -18,11 +18,12 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 The following custom components are used in this deployment - these can be installed from HACS
 - [roomba-vacuum-card] - Custom Plugin Repository
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod)
+- [button-card](https://github.com/custom-cards/button-card)
 - [check-button-card](https://github.com/custom-cards/check-button-card)
 - [lovelace-fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
 - [text-divider-row](https://github.com/custom-cards/text-divider-row/)
 
-A working MQTT Server with discovery is also needed (in conjunction with the check-button-card for Maintenance items)
+A working MQTT Server with discovery is also needed (in conjunction with the check-button-card for Maintenance items) <https://www.home-assistant.io/integrations/sensor.mqtt/>
 
 ### Step 2: Get Robot Login Details
 
@@ -54,6 +55,10 @@ I have also included an example PHP Docker Image which i use to host the map.
 
 To allow this to work on Hass.io - I have created a custom github repository which can be added to Hass.io allowing the installation of the rest980 and nginx-php Docker Images (on amd64 systems only - as this is what the source image suports!)
 
+**PORTAINER-IN-HASSIO**
+```
+Refer docker-portainer-stack.yaml
+```
 **DOCKER-COMPOSE**
 ```
 Refer docker-compose.yaml
