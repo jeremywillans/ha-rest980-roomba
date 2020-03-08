@@ -21,6 +21,7 @@ The following custom components are used in this deployment - these can be insta
 - [check-button-card](https://github.com/custom-cards/check-button-card) - **NOTE** Currently need to use my forked version until PR is merged (Custom Plugin Repository https://github.com/jeremywillans/check-button-card, build e80ef56)
 - [lovelace-fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
 - [text-divider-row](https://github.com/custom-cards/text-divider-row/)
+- [button-card](https://github.com/custom-cards/button-card)
 
 A working MQTT Server with discovery is also needed (in conjunction with the check-button-card for Maintenance items)
 
