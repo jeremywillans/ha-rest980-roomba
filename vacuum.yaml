@@ -67,6 +67,12 @@ sensor:
               false : 'Not Full' } %}
             {% set state =  state_attr('sensor.rest980', 'bin')["full"] %}
             {{ mapper[state] if state in mapper else state }}
+          bin_present: >-
+            {% set mapper =  {
+              true : 'Yes',
+              false : 'No' } %}
+            {% set state =  state_attr('sensor.rest980', 'bin')["present"] %}
+            {{ mapper[state] if state in mapper else state }}
           clean_base: >-
             {% set mapper =  {
               300 : 'Ready',
@@ -85,9 +91,10 @@ sensor:
             {% endif %}
           rssi: >-
             {{ state_attr('sensor.rest980', 'signal')['rssi'] }}
-          area_cleaned: >-
-            {{ (state_attr("sensor.rest980", "bbrun")["sqft"] / 10.764 * 100)| round() }} m²
-          job_time: >-
+          total_area: >-
+            {{ (state_attr("sensor.rest980", "bbrun")["sqft"] / 10.764 * 100)| round() }}m²
+          # {{ (state_attr("sensor.rest980", "bbrun")["sqft"] }}ft²
+          total_time: >-
             {{ state_attr('sensor.rest980', 'bbrun')['hr'] }}h {{ state_attr('sensor.rest980', 'bbrun')['min'] }}m
           total_jobs: >-
             {{ state_attr('sensor.rest980', 'bbmssn')['nMssn'] }}
@@ -95,6 +102,31 @@ sensor:
             {{ state_attr('sensor.rest980', 'bbrun')['nScrubs'] }}
           evac_events: >-
             {{ state_attr('sensor.rest980', 'bbrun')['nEvacs'] }}  
+          job_initiator: >-
+            {% set mapper =  {
+              'schedule' : 'Scheduler',
+              'rmtApp' : 'App',
+              'manual' : 'Robot',
+              'localApp' : 'HA' } %}
+            {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')["initiator"] %}
+            {{ mapper[state] if state in mapper else state }}
+          job_time: >-
+            {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['mssnM'] | int %}
+            {% if time > 60 %}
+              {{ time // 60 }}h {{ '{:0>2d}'.format(time%60) }}m
+            {% else %}
+              {{time}}m
+            {% endif %}
+          job_recharge: >-
+            {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['rechrgM'] | int %}
+            {% if time > 60 %}
+              {{ time // 60 }}h {{ '{:0>2d}'.format(time%60) }}m
+            {% else %}
+              {{time}}m
+            {% endif %}
+          job_area: >-
+            {{ (state_attr("sensor.rest980", "cleanMissionStatus")["sqft"] / 10.764)| round() }}m²
+          # {{ (state_attr("sensor.rest980", "cleanMissionStatus")["sqft"] }}ft²
           maint_due: >-
             {% if is_state('input_boolean.vacuum_maint_due', 'on') %}
               true
@@ -242,7 +274,6 @@ group:
 automation:
   # Initiate Selective Room Clean
   - alias: Vacuum Clean Rooms
-    hide_entity: true
     trigger:
     - platform: event
       event_type: initiate_vacuum_clean       
@@ -277,12 +308,14 @@ automation:
     condition: 
       condition: or
       conditions:
-        - condition: state
-          entity_id: sensor.vacuum
-          state: 'Clean'
-        - condition: state
-          entity_id: sensor.vacuum
-          state: 'Train'
+        - condition: template
+          value_template: "{{ is_state_attr('sensor.vacuum', 'phase', 'Run') }}"
+        - condition: template
+          value_template: "{{ is_state_attr('sensor.vacuum', 'phase', 'Sent Home') }}"
+        - condition: template
+          value_template: "{{ is_state_attr('sensor.vacuum', 'phase', 'Mid Dock') }}"
+        - condition: template
+          value_template: "{{ is_state_attr('sensor.vacuum', 'phase', 'Final Dock') }}"
     action:
       - service: homeassistant.update_entity
         entity_id: sensor.rest980
@@ -382,6 +415,7 @@ automation:
           'sensor.vacuum_maint_clean_contacts',
           'sensor.vacuum_maint_clean_filter',
           'sensor.vacuum_maint_clean_wheel',
+          'sensor.vacuum_maint_clean_bin',
           'sensor.vacuum_maint_replace_brushes',
           'sensor.vacuum_maint_replace_filter',
           'sensor.vacuum_maint_replace_wheel'
@@ -389,7 +423,7 @@ automation:
     action:
       - service_template: >-
           {% set ns = namespace(count = 0) %}
-          {% for item in states.sensor if 'vacuum_maint' in item.entity_id and (state_attr(item.entity_id, 'visibility_timestamp') < as_timestamp(now())) %}
+          {% for item in states.sensor if 'vacuum_maint' in item.entity_id and (state_attr(item.entity_id, 'timeout_timestamp') < as_timestamp(now())) %}
             {% set ns.count = loop.index %}
           {% endfor %}
           {% if ns.count > 0 %}
