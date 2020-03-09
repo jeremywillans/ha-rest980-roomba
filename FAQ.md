@@ -8,13 +8,13 @@ Please let me know if you think anything else should be added to this list!
 
 ### 1. BLID/Password Issues
 
-Retieving your BLID/Password is failry straight forward [this HA Add-on](https://github.com/jeremywillans/hass-addons/tree/master/roombapw) provides an easy way of obtaining your details.
+Retieving your BLID/Password is fairly straight forward [this HA Add-on](https://github.com/jeremywillans/hass-addons/tree/master/roombapw) provides an easy way of obtaining your details.
 
 You are essentially using roombapw to 'pair' as an additional device to your roomba - as outlines in the [official documentation](https://homesupport.irobot.com/app/answers/detail/a_id/8991/~/how-do-i-add-my-wi-fi-connected-robot-to-an-additional-mobile-device-or-phone%3F)
 
 **Notes**
 - Dont have the iRobot App running when doing this!
-- Hold the Clean button for two seconds when starting the pair process
+- Hold the Home button for two seconds when starting the pair process
 
 ### 2. Selective Cleaning isnt working
 
@@ -29,7 +29,7 @@ vacuum_kitchen: '{"region_id": "16","region_name": "Kitchen","region_type": "kit
 
 ### 3. PHP File downloads instead of rendering
 
-HA / HA Core does not have inbuilt PHP Support. You need to deploy a php compatible web server to host this image.
+HA / HA Core does not have in-built PHP Support. You need to deploy a php compatible web server to host this image.
 This repo makes use of the php-nginx docker image (available as a HA Addon) to allow this file to render correctly.
 
 
@@ -67,6 +67,30 @@ The Custom Roomba Card Maintnance icon (top right corner) uses the maint_due att
 The Automations for Roomba Location updating and Map Generation is expecting a Status of 'Clean', this is achieved in the vacuum.yaml file by  mapping the underlying vacuum cycle to reflect this, if you find that you status does not match this (for example the Roomba980 uses a mode of 'quick' which has since been incorporated), changes to the vacuum.yaml are needed to add this.
 
 If you do encounter this - please let me know so I can update GH!
+
+### 7. Map tips
+
+There are several methods to create the map, however the below is a good getting started method
+
+- Perform a full clean
+- Delete the latest.png file in the vacuum directory (prevents image.php from displaying the cached file)
+- Adjust the variables in the image.php file until the floor plan reflects your desired layout
+-- Start with Height and Width, then Flip and X/Y Offets, then Rotate and Scale
+- Open map in browser and add last=true to end of URL (http://<fqdn/host>:<phpport>/image.php?last=true). This will create a latest.png and <date>.png file
+- Copy this file to your local system and open in a paint program, such as [paint.net](https://www.getpaint.net/)
+- Use this file as the "floor space" and use layers to either scale an existing floorplan or create a new one by creating "walls" around your floor space. 
+- Upload floor.png file to vacuum directory, delete latest.png and open map again (without last=true!)
+- Edit any further variables as required to achieve your desired layout.
+
+### 8. Image Fill Mode
+
+If you want to fill in the map rather than showing lines, you can update the variables ($line_thickness) in the image.php file to increase the thickness of lines.
+To cover the 'overspray' caused in this mode, it is recommended to duplicate your floorplan image, making the floor transparent, adding to vaccum folder update the relevant variables in image.php ($overlay_walls and $walls_image)
+
+### 9. Issues with MQTT Sensors
+
+If your having issues with MQTT sensors, you can check the sensors directly on your MQTT Brokker using [MQTT Explorer](http://mqtt-explorer.com/).
+If in doubt, delete the sensor (with state and config topic) and recreate from Lovelace using the check-button-card.
 
 ## Support
 
