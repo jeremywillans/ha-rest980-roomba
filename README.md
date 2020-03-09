@@ -6,6 +6,8 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 
 [![gh_release]](../../releases)
 [![gh_last_commit]](../../commits/master)
+![Supports amd64 Architecture][amd64-shield]
+![Supports armv7 Architecture][armv7-shield]
 
 ## Example Lovelace UI View
 
@@ -18,11 +20,12 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 The following custom components are used in this deployment - these can be installed from HACS
 - [roomba-vacuum-card] - Custom Plugin Repository
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod)
-- [check-button-card](https://github.com/custom-cards/check-button-card) - **NOTE** Currently need to use my forked version until PR is merged (Custom Plugin Repository https://github.com/jeremywillans/check-button-card, build e80ef56)
+- [check-button-card](https://github.com/custom-cards/check-button-card)
 - [lovelace-fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
 - [text-divider-row](https://github.com/custom-cards/text-divider-row/)
+- [button-card](https://github.com/custom-cards/button-card)
 
-A working MQTT Server with discovery is also needed (in conjunction with the check-button-card for Maintenance items)
+A working MQTT Server with discovery is also needed (in conjunction with the check-button-card for Maintenance items) <https://www.home-assistant.io/integrations/sensor.mqtt/>
 
 ### Step 2: Get Robot Login Details
 
@@ -46,13 +49,15 @@ To allow the map to be correctly produced, you will need to create a new vacuum 
 
 Copy the contents of the Vacuum directory from Github into this folder.
 
-Note: The image.php file will need updating, but this will be done after the setup is complete.
+**Note:** The image.php file will need updating, but this will be done after the setup is complete.
 
 ### Step 4: Configure Docker / HA Add-on
 I use docker compose for all my HA related images, but have also listed the docker run command (copied from the rest980 github page)
 I have also included an example PHP Docker Image which i use to host the map.
 
-To allow this to work on Hass.io - I have created a custom github repository which can be added to Hass.io allowing the installation of the rest980 and nginx-php Docker Images (on amd64 systems only - as this is what the source image suports!)
+To allow this to work on Hass.io - I have created a custom github repository which can be added to Hass.io allowing the installation of the rest980 and nginx-php Docker Images (support arm and amd64 platforms)
+
+**Note:** Docker Hub only hosts a amd64 version of rest980, I have configured the HA Addon (formerley HASS) to build the image locally so it works on RPi (armv7). If you dont use HA and want to run rest980 on a non-arm64 platform, you will need to build the image manually.
 
 **DOCKER-COMPOSE**
 ```
@@ -66,6 +71,10 @@ docker network create docker
 ```
 docker run -e BLID=myuser -e PASSWORD=mypass -e ROBOT_IP=myrobotIP -e FIRMWARE_VERSION=2 -p 3000:3000 koalazak/rest980:latest
 docker run -p 3001:80 -v /<HA_CONFIG>/roomba:/app webhippie/php-nginx:latest
+```
+**PORTAINER-IN-HASSIO**
+```
+Refer docker-portainer-stack.yaml
 ```
 
 Confirm you can access the WebUI
@@ -198,6 +207,8 @@ or any of its subsidiaries or its affiliates. The official iRobot website can be
 
 [gh_release]: https://img.shields.io/github/v/release/jeremywillans/ha-rest980-roomba.svg?style=for-the-badge
 [gh_last_commit]: https://img.shields.io/github/last-commit/jeremywillans/ha-rest980-roomba.svg?style=for-the-badge
+[amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg?style=for-the-badge
+[armv7-shield]: https://img.shields.io/badge/armv7-yes-green.svg?style=for-the-badge
 
 [forum]: https://community.home-assistant.io/t/irobot-roomba-i7-configuration-using-rest980/161175
 [issue]: https://github.com/jeremywillans/ha-rest980-roomba/issues
