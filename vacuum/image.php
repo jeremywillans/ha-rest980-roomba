@@ -4,23 +4,36 @@
 
 // ADJUST THESE PARAMETERS
 $vacuum_log = 'http://<ip or fqdn of docker host>:<nginxphpport>/vacuum.log'; # Could also be HTTPS
-$overlay_image = 'floor.png';
-$show_stuck_positions = true;
-$map_width = 1050;
-$map_height = 900;
+$overlay_image = 'floor.png'; # Background Layer
+$overlay_walls = false; # Allows overlaying of walls, used in fill mode to cover 'spray'
+$walls_image = 'walls.png'; # Walls Image must contain transparent floor
+$show_stuck_positions = true; 
+$line_thickness = 2; # Default 2, Set to ~60 for Fill Mode
+$map_width = 1050; # Ensure overlay and wall images match this size
+$map_height = 900; # Ensure overlay and wall images match this size
 $x_offset = 220;
 $y_offset = 220;
 $flip_vertical = false;
 $flip_horizontal = false;
-$rotate_image = true;
-$rotate_degrees = 270;
+$rotate_angle = 0; # Allows rotating of the roomba lines
+$scale=1.00; # Allows scaling of roomba lines
 $ha_rest980 = 'https://<ip or fqdn of home assistant>:<haport>/api/states/sensor.rest980';
 $ha_token = '<ha_long_live_token>';
 $ha_timezone = 'Australia/Brisbane'; # Supported Timezones https://www.php.net/manual/en/timezones.php
 //
-// COLOR CAN BE EDITED ON LINE 109
+// Line Color - RGB
+// -1 represents gradual increase from 0 to 255 based on number of logged locations
 //
-/////////////////
+$color_red = -1;
+$color_green = 255;
+$color_blue = -1;
+//
+// Examples
+// red = -1 , green = 255 , blue = -1  ---> Green to White Fade
+// red = 0 , green = -1 , blue = 255   ---> Blue to Aqua Fade
+// red = 0 , green = 0 , blue = 255    ---> Solid Blue
+//
+///////////////////////////////////////////////////////////////////
 
 if(isset($_GET['clear'])) {
   @unlink("latest.png");
@@ -94,22 +107,20 @@ foreach($coords as $i => $coord) {
   
   $part= hexdec("ff");
   $part = round($part * $i/sizeof($coords));
-          
-  // EDIT BELOW LINE TO MODIFY THE COLOR USED
-  //
-  // imagecolorallocate($image, red, green, blue)
-  //
-  // $part represents gradual increase from 0 to 255 based on number of logged locations
-  //
-  // Examples - 
-  // imagecolorallocate($image, $part, 255, $part);  - Green to White Fade
-  // imagecolorallocate($image, 0, $part, 255);      - Blue to Aqua Fade
-  // imagecolorallocate($image, $part, 0, 255);      - Blue to Pink Fade
-  //
-  $color = imagecolorallocate($image, $part, 255, $part);
+
+  // Calculate Line Color
+  $red = ($color_red === -1 ? $part : $color_red);
+  $green = ($color_green === -1 ? $part : $color_green);
+  $blue = ($color_blue === -1 ? $part : $color_blue);
+  
+  $color = imagecolorallocate($image, $red, $green, $blue);
   $x = $split[1]+$x_offset;
   $y = $split[0]+$y_offset;
   $theta = $split[2];
+  
+  // Rotate Calculations
+  $x=($x*cos(deg2rad($rotate_angle))+$y*sin(deg2rad($rotate_angle)))*$scale;
+  $y=(-1*$x*sin(deg2rad($rotate_angle))+$y*cos(deg2rad($rotate_angle)))*$scale;
   
   $boxsize=4;
   $shift_y = 2;
@@ -117,7 +128,7 @@ foreach($coords as $i => $coord) {
   
   imagerectangle($image, $x+$shift_x, $y+$shift_y, $x+$boxsize+$shift_x, $y+$boxsize+$shift_y, $color);
   if(isset($oldx) && isset($oldy)) {
-    imagelinethick($image, $oldx+($boxsize/2)+$shift_x, $oldy+($boxsize/2)+$shift_y, $x+($boxsize/2)+$shift_x, $y+($boxsize/2)+$shift_y, $color, 2);
+    imagelinethick($image, $oldx+($boxsize/2)+$shift_x, $oldy+($boxsize/2)+$shift_y, $x+($boxsize/2)+$shift_x, $y+($boxsize/2)+$shift_y, $color, $line_thickness);
   }
   
   if($i+1==sizeof($coords)) {
@@ -165,17 +176,24 @@ if($flip_horizontal) {
   imageflip( $image, IMG_FLIP_HORIZONTAL );
 }
 
-if($rotate_image) {
-  $transparent = imagecolorallocatealpha($image, 0, 0, 0, 127);
-  $image = imagerotate($image, $rotate_degrees, $transparent, 1);
-}
-
+// Create Final Image
 $dest = imagecreatetruecolor($map_width,$map_height);
 imagesavealpha($dest, true);
+// Create Background Image
 $overlayImage = imagecreatefrompng($overlay_image);
+// Merge Background Image
 imagecopy($dest, $overlayImage, 0, 0, 0, 0, imagesx($overlayImage), imagesy($overlayImage));
-imagecopy($dest, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
 imagedestroy($overlayImage);
+// Merge Roomba Lines
+imagecopy($dest, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
+
+if ($overlay_walls) {
+  // Create Walls Image
+  $overlayWalls = imagecreatefrompng($walls_image);
+  // Merge Walls Image
+  imagecopy($dest, $overlayWalls, 0, 0, 0, 0, imagesx($overlayWalls), imagesy($overlayWalls));
+  imagedestroy($overlayWalls);
+}
 
 $string = "";
 
