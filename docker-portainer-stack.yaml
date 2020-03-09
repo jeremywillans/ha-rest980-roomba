@@ -1,0 +1,26 @@
+###################################
+# Docker Portainer Stack
+###################################
+version: "2"
+services:
+  rest980:
+    container_name: rest980
+    image: koalazak/rest980:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - BLID=<BLID>
+      - PASSWORD=<PW>
+      - ROBOT_IP=<IP>
+      - FIRMWARE_VERSION=2
+    restart: unless-stopped
+  php-nginx:
+    container_name: php-nginx
+    image: webhippie/php-nginx:latest
+    environment:
+      NGINX_WEBROOT: "/app"
+    volumes:
+      - /mnt/data/supervisor/homeassistant/vacuum:/app
+    ports:
+      - "3001:8080"
+    restart: unless-stopped
