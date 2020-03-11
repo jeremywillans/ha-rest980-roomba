@@ -121,7 +121,7 @@ Refer vacuum.yaml
 
 ### Step 7: Configure Map Options
 
-You will need to update the variables at the top of the image.php and image_dev.php to align with your environment.
+You will need to update the variables at the top of the image.php to align with your environment.
 
 Specifically the log, rest980, token and timezone ones should be done now - the rest are best to update once a full clean has run (to populate the map)
 
