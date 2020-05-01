@@ -20,6 +20,7 @@ sensor:
       - bbmssn
       - bbrun
       - name
+      - pmaps
     resource: !secret vacuum_state
     value_template: 'OK'
     scan_interval: 10
@@ -29,6 +30,9 @@ sensor:
         friendly_name_template: >-
           {{ state_attr('sensor.rest980', 'name') }}
         value_template: >-
+          {% if state_attr('sensor.rest980', 'cleanMissionStatus')["cycle"] == 'none' and state_attr('sensor.rest980', 'cleanMissionStatus')["notReady"] == 39 %}
+              Pending
+          {% else %}
           {% set mapper =  {
             'clean' : 'Clean',
             'quick' : 'Clean',
@@ -39,6 +43,7 @@ sensor:
             'none' : 'Ready' } %}
           {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')["cycle"] %}
           {{ mapper[state] if state in mapper else state }}
+          {% endif %}
         icon_template: mdi:robot-vacuum
         attribute_templates:
           battery: >-
@@ -133,6 +138,10 @@ sensor:
             {% else %}
               false
             {% endif %}
+          pmap0_id: >-
+            {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'(\w+)': '\w+\'}") }}
+          pmap0_timestamp: >-
+            {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'\w+': '(\w+)\'}") }}
       vacuum_location:
         friendly_name_template: >-
           {{ state_attr('sensor.rest980', 'name') }} Location
@@ -212,12 +221,6 @@ input_text:
   vacuum_log:
     name: Vacuum Log Path
     initial: !secret vacuum_log
-  vacuum_pmap_id:
-    name: Floorplan ID
-    initial: !secret vacuum_pmap_id
-  vacuum_user_pmapv_id:
-    name: User Floorplan ID
-    initial: !secret vacuum_user_pmapv_id
 
   vacuum_clean_kitchen:
     name: Kitchen
@@ -283,12 +286,12 @@ automation:
           payload: >
             {
               "ordered": 0,
-              "pmap_id": "{{ states('input_text.vacuum_pmap_id') | string }}",
+              "pmap_id": "{{ state_attr('sensor.vacuum', 'pmap0_id') | string }}",
               "regions": [{% for boolean in states.input_boolean if 'vacuum_clean' in boolean.entity_id and is_state(boolean.entity_id, 'on') %}
                 {% set room = 'input_text.' + boolean.entity_id.split('.')[1] %} {{ states(room) | string }} {%- if not loop.last %},{%- endif %}
                 {%- endfor %}
               ],
-              "user_pmapv_id": "{{ states('input_text.vacuum_user_pmapv_id') | string }}"
+              "user_pmapv_id": "{{ state_attr('sensor.vacuum', 'pmap0_timestamp') | string }}"
             }
       - service: input_boolean.turn_off
         data:
@@ -368,6 +371,10 @@ automation:
         entity_id: sensor.vacuum
         from: 'Train'
         to: 'Ready'
+      - platform: state
+        entity_id: sensor.vacuum
+        from: 'Pending'
+        to: 'Ready'
     action:
       - service: notify.vacuumfile
         data_template: 
@@ -397,6 +404,12 @@ automation:
       - platform: state
         entity_id: sensor.vacuum
         from: 'Train'
+        to: 'Ready'
+        for:
+          seconds: 10
+      - platform: state
+        entity_id: sensor.vacuum
+        from: 'Pending'
         to: 'Ready'
         for:
           seconds: 10
