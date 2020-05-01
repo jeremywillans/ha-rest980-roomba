@@ -98,20 +98,18 @@ This will create a new local addon which you can install
 * Initiate a Clean Rooms clean from the iRobot App, ensuring you select all **BUT** one room! (if you select them all, it wont list them out. Perform a second clean on the remaining room to get all the details)
 * Navigate to ```http://<ip or fqdn of docker host>:<rest980port>/api/local/info/state```
 * Look for the "lastCommand" section and copy down the following info 
-    - pmap_id
-    - user_pmapv_id
     - regions
 
 ### Step 6: Configure Home Assistant Package and Secrets
 
 The below is my configuration YAML file which uses the [Packages](https://www.home-assistant.io/docs/configuration/packages/) feature in HA to keep all the separate components together.
 
-I split off the ids and regions into the secrets file to make it easier to manage for future updates (these will change if you update your floorplan from the iRobot app)
+I split off the regions into the secrets file to make it easier to manage for future updates (these will change if you update your floorplan from the iRobot app)
 
 I have tried to map as many of the reported statuses, however I occasionally get an "Unknown" in the logs, if you work out another state, please post it up!
 
 **Notes:** 
-- Make sure you **remove** any trailing commads from the regions when copying them into the secrets file!
+- Make sure you **remove** any trailing commads from the regions when copying them into the secrets file! You only need to copy the region ID, not the rest of the code
 - The input_booleans and input_text entries all start with vacuum as this is used in the templates for correct mapping in lovelace
 
 ```
