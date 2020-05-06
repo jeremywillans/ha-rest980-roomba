@@ -145,13 +145,13 @@ sensor:
             {% endif %}
           pmap0_id: >-
             {% if state_attr('sensor.rest980', 'pmaps')[0] is defined %}
-              {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'(\w+)': '\w+\'}") }}
+              {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
             {% else %}
               Unavailable
             {% endif %}
           pmap0_timestamp: >-
             {% if state_attr('sensor.rest980', 'pmaps')[0] is defined %}
-              {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'\w+': '(\w+)\'}") }}
+              {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'[\w\-]+': '(\w+)'}") }}
             {% else %}
               Unavailable
             {% endif %}
