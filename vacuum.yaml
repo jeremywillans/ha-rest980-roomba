@@ -155,6 +155,28 @@ sensor:
             {% else %}
               Unavailable
             {% endif %}
+          clean_passes: >-
+            {% if state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'false' %}
+              one
+            {% elif state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'true' %}
+              two
+            {% else %}
+              auto
+            {% endif %}
+          power_boost: >-
+            {% if state_attr('sensor.rest980', 'vacHigh') == 'false' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
+              eco
+            {% elif state_attr('sensor.rest980', 'vacHigh') == 'true' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
+              performance
+            {% else %}
+              auto
+            {% endif %}
+          clean_edges: >-
+            {% if state_attr('sensor.rest980', 'openOnly') == 'true' %}
+              false
+            {% else %}
+              true
+            {% endif %}
       vacuum_location:
         friendly_name_template: >-
           {{ state_attr('sensor.rest980', 'name') }} Location
