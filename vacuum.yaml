@@ -88,31 +88,57 @@ sensor:
                 350 : 'Bag Missing',
                 351 : 'Clogged',
                 352 : 'Sealing Problem',
-                353 : 'Bag Full' } %}
+                353 : 'Bag Full',
+                360 : 'Comms Problem' } %}
               {% set state =  state_attr('sensor.rest980', 'dock')['state'] %}
               {{ mapper[state] if state in mapper else state }}
             {% else %}
-              Unavailable
+              n-a
             {% endif %}
           location: >-
             {% if state_attr('sensor.rest980', 'pose')['theta'] is defined %}
               ({{ state_attr('sensor.rest980', 'pose')['point']['x'] }}, {{ state_attr('sensor.rest980', 'pose')['point']['y'] }}, {{ state_attr('sensor.rest980', 'pose')['theta'] }})
             {% else %}
-              Unavailable
+              n-a
             {% endif %}
           rssi: >-
-            {{ state_attr('sensor.rest980', 'signal')['rssi'] }}
+            {% if state_attr('sensor.rest980', 'signal')['rssi'] is defined %}
+              {{ state_attr('sensor.rest980', 'signal')['rssi'] }}
+            {% else %}
+              n-a
+            {% endif %}
           total_area: >-
-            {{ (state_attr('sensor.rest980', 'bbrun')['sqft'] / 10.764 * 100)| round() }}m²
-          # {{ (state_attr('sensor.rest980', 'bbrun')['sqft'] }}ft²
+            {% if state_attr('sensor.rest980', 'bbrun')['sqft'] is defined %}
+              {{ (state_attr('sensor.rest980', 'bbrun')['sqft'] / 10.764 * 100)| round() }}m²
+            {% else %}
+              n-a
+            {% endif %}
+          #   {{ (state_attr('sensor.rest980', 'bbrun')['sqft'] }}ft²
           total_time: >-
-            {{ state_attr('sensor.rest980', 'bbrun')['hr'] }}h {{ state_attr('sensor.rest980', 'bbrun')['min'] }}m
+            {% if state_attr('sensor.rest980', 'bbrun')['hr'] is defined %}
+              {{ state_attr('sensor.rest980', 'bbrun')['hr'] }}h {{ state_attr('sensor.rest980', 'bbrun')['min'] }}m
+            {% else %}
+              n-a
+            {% endif %}
           total_jobs: >-
-            {{ state_attr('sensor.rest980', 'bbmssn')['nMssn'] }}
+            {% if state_attr('sensor.rest980', 'bbrun')['nMssn'] is defined %}
+              {{ state_attr('sensor.rest980', 'bbmssn')['nMssn'] }}
+            {% else %}
+              n-a
+            {% endif %}
           dirt_events: >-
-            {{ state_attr('sensor.rest980', 'bbrun')['nScrubs'] }}
+            {% if state_attr('sensor.rest980', 'bbrun')['nScrubs'] is defined %}
+              {{ state_attr('sensor.rest980', 'bbrun')['nScrubs'] }}
+            {% else %}
+              n-a
+            {% endif %}
+          # evac_events I7+/S9+ Models (Clean Base)
           evac_events: >-
-            {{ state_attr('sensor.rest980', 'bbrun')['nEvacs'] }}  
+            {% if state_attr('sensor.rest980', 'bbrun')['nEvacs'] is defined %}
+              {{ state_attr('sensor.rest980', 'bbrun')['nEvacs'] }}  
+            {% else %}
+              n-a
+            {% endif %}
           job_initiator: >-
             {% set mapper =  {
               'schedule' : 'Scheduler',
@@ -122,61 +148,87 @@ sensor:
             {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['initiator'] %}
             {{ mapper[state] if state in mapper else state }}
           job_time: >-
-            {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['mssnM'] | int %}
-            {% if time > 60 %}
-              {{ time // 60 }}h {{ '{:0>2d}'.format(time%60) }}m
+            {% if state_attr('sensor.rest980', 'cleanMissionStatus')['mssnM'] is defined %}
+              {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['mssnM'] | int %}
+              {% if time > 60 %}
+                {{ time // 60 }}h {{ '{:0>2d}'.format(time%60) }}m
+              {% else %}
+                {{time}}m
+              {% endif %}
             {% else %}
-              {{time}}m
+              n-a
             {% endif %}
           job_recharge: >-
-            {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['rechrgM'] | int %}
-            {% if time > 60 %}
-              {{ time // 60 }}h {{ '{:0>2d}'.format(time%60) }}m
+            {% if state_attr('sensor.rest980', 'cleanMissionStatus')['rechrgM'] is defined %}
+              {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['rechrgM'] | int %}
+              {% if time > 60 %}
+                {{ time // 60 }}h {{ '{:0>2d}'.format(time%60) }}m
+              {% else %}
+                {{time}}m
+              {% endif %}
             {% else %}
-              {{time}}m
+              n-a
             {% endif %}
           job_area: >-
-            {{ (state_attr('sensor.rest980', 'cleanMissionStatus')['sqft'] / 10.764)| round() }}m²
-          # {{ (state_attr('sensor.rest980', 'cleanMissionStatus')['sqft'] }}ft²
+            {% if state_attr('sensor.rest980', 'cleanMissionStatus')['sqft'] is defined %}
+              {{ (state_attr('sensor.rest980', 'cleanMissionStatus')['sqft'] / 10.764)| round() }}m²  
+            {% else %}
+              n-a
+            {% endif %}
+          #   {{ (state_attr('sensor.rest980', 'cleanMissionStatus')['sqft'] }}ft²
+          clean_passes: >-
+            {% if state_attr('sensor.rest980', 'noAutoPasses') is defined %}
+              {% if state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'false' %}
+                One
+              {% elif state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'true' %}
+                Two
+              {% else %}
+                Auto
+              {% endif %} 
+            {% else %}
+              n-a
+            {% endif %}
+          power_boost: >-
+            {% if state_attr('sensor.rest980', 'vacHigh') is defined %}
+              {% if state_attr('sensor.rest980', 'vacHigh') == 'false' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
+                Eco
+              {% elif state_attr('sensor.rest980', 'vacHigh') == 'true' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
+                Performance
+              {% else %}
+                Auto
+              {% endif %}
+            {% else %}
+              n-a
+            {% endif %}
+          clean_edges: >-
+            {% if state_attr('sensor.rest980', 'openOnly') is defined %}
+              {% if state_attr('sensor.rest980', 'openOnly') == 'true' %}
+                False
+              {% else %}
+                True
+              {% endif %}
+            {% else %}
+              n-a
+            {% endif %}
           maint_due: >-
             {% if is_state('input_boolean.vacuum_maint_due', 'on') %}
               true
             {% else %}
               false
             {% endif %}
+          # pmap0_id I7/S9 Models
           pmap0_id: >-
             {% if state_attr('sensor.rest980', 'pmaps')[0] is defined %}
               {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
             {% else %}
-              Unavailable
+              n-a
             {% endif %}
+          # pmap0_timestamp I7/S9 Models
           pmap0_timestamp: >-
             {% if state_attr('sensor.rest980', 'pmaps')[0] is defined %}
               {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'[\w\-]+': '(\w+)'}") }}
             {% else %}
-              Unavailable
-            {% endif %}
-          clean_passes: >-
-            {% if state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'false' %}
-              one
-            {% elif state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'true' %}
-              two
-            {% else %}
-              auto
-            {% endif %}
-          power_boost: >-
-            {% if state_attr('sensor.rest980', 'vacHigh') == 'false' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
-              eco
-            {% elif state_attr('sensor.rest980', 'vacHigh') == 'true' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
-              performance
-            {% else %}
-              auto
-            {% endif %}
-          clean_edges: >-
-            {% if state_attr('sensor.rest980', 'openOnly') == 'true' %}
-              false
-            {% else %}
-              true
+              n-a
             {% endif %}
       vacuum_location:
         friendly_name_template: >-
