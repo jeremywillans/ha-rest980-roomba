@@ -22,9 +22,9 @@ Make sure you have accurately copied your regions into the secrets.yaml file!
 Check for trailing commands or brackets as these will **break** the code
 
 ```
-vacuum_kitchen: '{"region_id": "16","region_name": "Kitchen","region_type": "kitchen"}'   <-- GOOD
-vacuum_kitchen: '{"region_id": "16","region_name": "Kitchen","region_type": "kitchen"},'  <-- BAD - EXTRA COMMA
-vacuum_kitchen: '{"region_id": "16","region_name": "Kitchen","region_type": "kitchen"}}'  <-- BAD - EXTRA BRACKET
+vacuum_kitchen: '{"region_id": "16"}'   <-- GOOD
+vacuum_kitchen: '{"region_id": "16"},'  <-- BAD - EXTRA COMMA
+vacuum_kitchen: '{"region_id": "16"}}'  <-- BAD - EXTRA BRACKET
 ```
 
 ### 3. PHP File downloads instead of rendering
