@@ -87,6 +87,7 @@ sensor:
                 303 : 'Empty',
                 350 : 'Bag Missing',
                 351 : 'Clogged',
+                352 : 'Sealing Problem',
                 353 : 'Bag Full' } %}
               {% set state =  state_attr('sensor.rest980', 'dock')['state'] %}
               {{ mapper[state] if state in mapper else state }}
