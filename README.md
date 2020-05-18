@@ -60,9 +60,8 @@ To allow this to work on Hass.io - I have created a custom github repository whi
 **Note:** Docker Hub only hosts a amd64 version of rest980, I have configured the HA Addon (formerley HASS) to build the image locally so it works on RPi (armv7). If you dont use HA and want to run rest980 on a non-arm64 platform, you will need to build the image manually.
 
 **DOCKER-COMPOSE**
-```
-Refer docker-compose.yaml
-```
+> [docker-compose.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/docker-compose.yaml)
+
 **Note:** I use a separate docker bridged network which can be created with:
 ```
 docker network create docker
@@ -73,9 +72,7 @@ docker run -e BLID=myuser -e PASSWORD=mypass -e ROBOT_IP=myrobotIP -e FIRMWARE_V
 docker run -p 3001:80 -v /<HA_CONFIG>/roomba:/app webhippie/php-nginx:latest
 ```
 **PORTAINER-IN-HASSIO**
-```
-Refer docker-portainer-stack.yaml
-```
+> [docker-portainer-stack.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/docker-portainer-stack.yaml)
 
 Confirm you can access the WebUI
 ```
@@ -131,9 +128,7 @@ Note: This config is shown as the two cards used
 - Vertical Stack
 - Picture Glance
 
-```
-Refer lovelace.yaml
-```
+> [lovelace.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/lovelace.yaml)
 
 ### Step 9: Update Map Options
 
