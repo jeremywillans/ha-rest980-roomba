@@ -4,7 +4,7 @@
 
 // ADJUST THESE PARAMETERS
 $vacuum_log = 'http://<ip or fqdn of docker host>:<nginxphpport>/vacuum.log'; # Could also be HTTPS
-$set_first_coordinate = 1; # Ability to skip initial coordinate(s) if incorrect data logged
+$set_first_coordinate = 0; # Ability to skip initial coordinate(s) if incorrect data logged
 $overlay_image = 'floor.png'; # Background Layer
 $overlay_walls = false; # Allows overlaying of walls, used in fill mode to cover 'spray'
 $walls_image = 'walls.png'; # Walls Image must contain transparent floor
