@@ -4,6 +4,7 @@
 
 // ADJUST THESE PARAMETERS
 $vacuum_log = 'http://<ip or fqdn of docker host>:<nginxphpport>/vacuum.log'; # Could also be HTTPS
+$set_first_coordinate = 1; # Ability to skip initial coordinate(s) if incorrect data logged
 $overlay_image = 'floor.png'; # Background Layer
 $overlay_walls = false; # Allows overlaying of walls, used in fill mode to cover 'spray'
 $walls_image = 'walls.png'; # Walls Image must contain transparent floor
@@ -20,6 +21,7 @@ $scale=1.00; # Allows scaling of roomba lines
 $ha_rest980 = 'https://<ip or fqdn of home assistant>:<haport>/api/states/sensor.rest980';
 $ha_token = '<ha_long_live_token>';
 $ha_timezone = 'Australia/Brisbane'; # Supported Timezones https://www.php.net/manual/en/timezones.php
+$ha_text_delimiter = " \n"; # How text is displayed on the map top " \n" --> New Line ## " |" --> Show on one line
 //
 // Line Color - RGB
 // -1 represents gradual increase from 0 to 255 based on number of logged locations
@@ -90,6 +92,10 @@ imagealphablending($roomba, false);
 imagesavealpha($roomba, true);
 
 foreach($coords as $i => $coord) {
+  # Skip initial coordinates if needed
+  if ($i < $set_first_coordinate) {
+    continue;
+  }
   $split = explode(",", $coord);
   if(sizeof($split)<2) {
     if(($coord == "Stuck") & ($show_stuck_positions)) {
@@ -213,7 +219,7 @@ if($lastline == "Finished") {
   curl_close ($ch);
   $data = json_decode($server_output);
   $battery_level = $data->attributes->batPct;
-  $string.="\n Battery: ".$battery_level."%";
+  $string.=$ha_text_delimiter." Battery: ".$battery_level."%";
   
 }
 else if($lastline == "Stuck"){
@@ -227,7 +233,7 @@ else {
 
 date_default_timezone_set($ha_timezone);
 $dt = date('H:i:s Y-m-d', $date);
-$txt = " Started: ".$dt."\n"." Status: ".$status.$string;
+$txt = " Started: ".$dt.$ha_text_delimiter." Status: ".$status.$string;
 $white = imagecolorallocate($dest, 255, 255, 255);
 $font = "./monaco.ttf"; 
 imagettftext($dest, 10, 0, 5, 15, $white, $font, $txt);
