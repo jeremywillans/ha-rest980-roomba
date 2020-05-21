@@ -309,6 +309,9 @@ input_text:
   vacuum_log:
     name: Vacuum Log Path
     initial: !secret vacuum_log
+  vacuum_dir:
+    name: Vacuum Dir Path
+    initial: !secret vacuum_dir
 
   vacuum_clean_kitchen:
     name: Kitchen
@@ -534,6 +537,15 @@ automation:
           {% endif %}
         entity_id: input_boolean.vacuum_maint_due
 
+  # Delete Old Vacuum Image Files
+  - alias: Vacuum Delete Images
+    initial_state: true
+    trigger:
+      platform: time_pattern
+      hours: "00"
+    action:
+      - service: shell_command.vacuum_delete_images
+
 ###################################
 # Notify
 ###################################
@@ -561,3 +573,4 @@ shell_command:
   vacuum_clear_log: cp /dev/null {{ states('input_text.vacuum_log') }}
   vacuum_clear_image: curl -X GET -s -O /dev/null '{{ states("input_text.vacuum_map") }}?clear=true'
   vacuum_generate_image: curl -X GET -s -O /dev/null '{{ states("input_text.vacuum_map") }}?last=true'
+  vacuum_delete_images: find {{ states('input_text.vacuum_dir') }} -regex ".*[0-9]\.png" -type f -mtime +20 -exec rm -f {} \;
