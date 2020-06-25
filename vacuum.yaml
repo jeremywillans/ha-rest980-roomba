@@ -25,7 +25,7 @@ sensor:
     value_template: 'OK'
     scan_interval: 10
   - platform: template
-    sensors:
+    vacuums:
       vacuum:
         friendly_name_template: >-
           {{ state_attr('sensor.rest980', 'name') }}
