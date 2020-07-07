@@ -110,7 +110,7 @@ I have tried to map as many of the reported statuses, however I occasionally get
 - The input_booleans and input_text entries all start with vacuum as this is used in the templates for correct mapping in lovelace
 
 > [secrets.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/secrets.yaml)
-> [vacuum.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/lovelace.yaml)
+> [vacuum.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/vacuum.yaml)
 
 ### Step 7: Configure Map Options
 
