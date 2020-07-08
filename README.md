@@ -60,9 +60,8 @@ To allow this to work on Hass.io - I have created a custom github repository whi
 **Note:** Docker Hub only hosts a amd64 version of rest980, I have configured the HA Addon (formerley HASS) to build the image locally so it works on RPi (armv7). If you dont use HA and want to run rest980 on a non-arm64 platform, you will need to build the image manually.
 
 **DOCKER-COMPOSE**
-```
-Refer docker-compose.yaml
-```
+> [docker-compose.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/docker-compose.yaml)
+
 **Note:** I use a separate docker bridged network which can be created with:
 ```
 docker network create docker
@@ -73,9 +72,7 @@ docker run -e BLID=myuser -e PASSWORD=mypass -e ROBOT_IP=myrobotIP -e FIRMWARE_V
 docker run -p 3001:80 -v /<HA_CONFIG>/roomba:/app webhippie/php-nginx:latest
 ```
 **PORTAINER-IN-HASSIO**
-```
-Refer docker-portainer-stack.yaml
-```
+> [docker-portainer-stack.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/docker-portainer-stack.yaml)
 
 Confirm you can access the WebUI
 ```
@@ -102,7 +99,7 @@ This will create a new local addon which you can install
 
 ### Step 6: Configure Home Assistant Package and Secrets
 
-The below is my configuration YAML file which uses the [Packages](https://www.home-assistant.io/docs/configuration/packages/) feature in HA to keep all the separate components together.
+The below are my configuration YAML files which uses the [Packages](https://www.home-assistant.io/docs/configuration/packages/) feature in HA to keep all the separate components together.
 
 I split off the regions into the secrets file to make it easier to manage for future updates (these will change if you update your floorplan from the iRobot app)
 
@@ -112,10 +109,8 @@ I have tried to map as many of the reported statuses, however I occasionally get
 - Make sure you **remove** any trailing commads from the regions when copying them into the secrets file! You only need to copy the region ID, not the rest of the code
 - The input_booleans and input_text entries all start with vacuum as this is used in the templates for correct mapping in lovelace
 
-```
-Refer secrets.yaml
-Refer vacuum.yaml
-```
+> [secrets.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/secrets.yaml)
+> [vacuum.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/vacuum.yaml)
 
 ### Step 7: Configure Map Options
 
@@ -133,9 +128,7 @@ Note: This config is shown as the two cards used
 - Vertical Stack
 - Picture Glance
 
-```
-Refer lovelace.yaml
-```
+> [lovelace.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/lovelace.yaml)
 
 ### Step 9: Update Map Options
 

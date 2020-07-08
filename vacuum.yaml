@@ -22,10 +22,10 @@ sensor:
       - name
       - pmaps
     resource: !secret vacuum_state
-    value_template: 'OK'
+    value_template: "OK"
     scan_interval: 10
   - platform: template
-    sensors:
+    vacuums:
       vacuum:
         friendly_name_template: >-
           {{ state_attr('sensor.rest980', 'name') }}
@@ -45,6 +45,8 @@ sensor:
           {{ mapper[state] if state in mapper else state }}
           {% endif %}
         icon_template: mdi:robot-vacuum
+        start:
+          service: script.vacuum_clean
         attribute_templates:
           battery: >-
             {{ state_attr('sensor.rest980', 'batPct') }} %
@@ -87,31 +89,58 @@ sensor:
                 303 : 'Empty',
                 350 : 'Bag Missing',
                 351 : 'Clogged',
-                353 : 'Bag Full' } %}
+                352 : 'Sealing Problem',
+                353 : 'Bag Full',
+                360 : 'Comms Problem' } %}
               {% set state =  state_attr('sensor.rest980', 'dock')['state'] %}
               {{ mapper[state] if state in mapper else state }}
             {% else %}
-              Unavailable
+              n-a
             {% endif %}
           location: >-
             {% if state_attr('sensor.rest980', 'pose')['theta'] is defined %}
               ({{ state_attr('sensor.rest980', 'pose')['point']['x'] }}, {{ state_attr('sensor.rest980', 'pose')['point']['y'] }}, {{ state_attr('sensor.rest980', 'pose')['theta'] }})
             {% else %}
-              Unavailable
+              n-a
             {% endif %}
           rssi: >-
-            {{ state_attr('sensor.rest980', 'signal')['rssi'] }}
+            {% if state_attr('sensor.rest980', 'signal')['rssi'] is defined %}
+              {{ state_attr('sensor.rest980', 'signal')['rssi'] }}
+            {% else %}
+              n-a
+            {% endif %}
           total_area: >-
-            {{ (state_attr('sensor.rest980', 'bbrun')['sqft'] / 10.764 * 100)| round() }}m²
-          # {{ (state_attr('sensor.rest980', 'bbrun')['sqft'] }}ft²
+            {% if state_attr('sensor.rest980', 'bbrun')['sqft'] is defined %}
+              {{ (state_attr('sensor.rest980', 'bbrun')['sqft'] / 10.764 * 100)| round() }}m²
+            {% else %}
+              n-a
+            {% endif %}
+          #   {{ (state_attr('sensor.rest980', 'bbrun')['sqft'] }}ft²
           total_time: >-
-            {{ state_attr('sensor.rest980', 'bbrun')['hr'] }}h {{ state_attr('sensor.rest980', 'bbrun')['min'] }}m
+            {% if state_attr('sensor.rest980', 'bbrun')['hr'] is defined %}
+              {{ state_attr('sensor.rest980', 'bbrun')['hr'] }}h {{ state_attr('sensor.rest980', 'bbrun')['min'] }}m
+            {% else %}
+              n-a
+            {% endif %}
           total_jobs: >-
-            {{ state_attr('sensor.rest980', 'bbmssn')['nMssn'] }}
+            {% if state_attr('sensor.rest980', 'bbrun')['nMssn'] is defined %}
+              {{ state_attr('sensor.rest980', 'bbmssn')['nMssn'] }}
+            {% else %}
+              n-a
+            {% endif %}
           dirt_events: >-
-            {{ state_attr('sensor.rest980', 'bbrun')['nScrubs'] }}
+            {% if state_attr('sensor.rest980', 'bbrun')['nScrubs'] is defined %}
+              {{ state_attr('sensor.rest980', 'bbrun')['nScrubs'] }}
+            {% else %}
+              n-a
+            {% endif %}
+          # evac_events I7+/S9+ Models (Clean Base)
           evac_events: >-
-            {{ state_attr('sensor.rest980', 'bbrun')['nEvacs'] }}  
+            {% if state_attr('sensor.rest980', 'bbrun')['nEvacs'] is defined %}
+              {{ state_attr('sensor.rest980', 'bbrun')['nEvacs'] }}  
+            {% else %}
+              n-a
+            {% endif %}
           job_initiator: >-
             {% set mapper =  {
               'schedule' : 'Scheduler',
@@ -121,61 +150,67 @@ sensor:
             {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['initiator'] %}
             {{ mapper[state] if state in mapper else state }}
           job_time: >-
-            {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['mssnM'] | int %}
-            {% if time > 60 %}
-              {{ time // 60 }}h {{ '{:0>2d}'.format(time%60) }}m
+            {% if state_attr('sensor.rest980', 'cleanMissionStatus')['mssnM'] is defined %}
+              {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['mssnM'] | int %}
+              {% if time > 60 %}
+                {{ time // 60 }}h {{ '{:0>2d}'.format(time%60) }}m
+              {% else %}
+                {{time}}m
+              {% endif %}
             {% else %}
-              {{time}}m
+              n-a
             {% endif %}
           job_recharge: >-
-            {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['rechrgM'] | int %}
-            {% if time > 60 %}
-              {{ time // 60 }}h {{ '{:0>2d}'.format(time%60) }}m
+            {% if state_attr('sensor.rest980', 'cleanMissionStatus')['rechrgM'] is defined %}
+              {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['rechrgM'] | int %}
+              {% if time > 60 %}
+                {{ time // 60 }}h {{ '{:0>2d}'.format(time%60) }}m
+              {% else %}
+                {{time}}m
+              {% endif %}
             {% else %}
-              {{time}}m
+              n-a
             {% endif %}
           job_area: >-
-            {{ (state_attr('sensor.rest980', 'cleanMissionStatus')['sqft'] / 10.764)| round() }}m²
-          # {{ (state_attr('sensor.rest980', 'cleanMissionStatus')['sqft'] }}ft²
-          maint_due: >-
-            {% if is_state('input_boolean.vacuum_maint_due', 'on') %}
-              true
+            {% if state_attr('sensor.rest980', 'cleanMissionStatus')['sqft'] is defined %}
+              {{ (state_attr('sensor.rest980', 'cleanMissionStatus')['sqft'] / 10.764)| round() }}m²  
             {% else %}
-              false
+              n-a
             {% endif %}
-          pmap0_id: >-
-            {% if state_attr('sensor.rest980', 'pmaps')[0] is defined %}
-              {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
-            {% else %}
-              Unavailable
-            {% endif %}
-          pmap0_timestamp: >-
-            {% if state_attr('sensor.rest980', 'pmaps')[0] is defined %}
-              {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'[\w\-]+': '(\w+)'}") }}
-            {% else %}
-              Unavailable
-            {% endif %}
+          #   {{ (state_attr('sensor.rest980', 'cleanMissionStatus')['sqft'] }}ft²
           clean_passes: >-
-            {% if state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'false' %}
-              one
-            {% elif state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'true' %}
-              two
+            {% if state_attr('sensor.rest980', 'noAutoPasses') is defined %}
+              {% if state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'false' %}
+                One
+              {% elif state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'true' %}
+                Two
+              {% else %}
+                Auto
+              {% endif %} 
             {% else %}
-              auto
+              n-a
             {% endif %}
           carpet_boost: >-
-            {% if state_attr('sensor.rest980', 'vacHigh') == 'false' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
-              eco
-            {% elif state_attr('sensor.rest980', 'vacHigh') == 'true' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
-              performance
+            {% if state_attr('sensor.rest980', 'vacHigh') is defined %}
+              {% if state_attr('sensor.rest980', 'vacHigh') == 'false' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
+                Eco
+              {% elif state_attr('sensor.rest980', 'vacHigh') == 'true' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
+                Performance
+              {% else %}
+                Auto
+              {% endif %}
             {% else %}
-              auto
+              n-a
             {% endif %}
           clean_edges: >-
-            {% if state_attr('sensor.rest980', 'openOnly') == 'true' %}
-              false
+            {% if state_attr('sensor.rest980', 'openOnly') is defined %}
+              {% if state_attr('sensor.rest980', 'openOnly') == 'true' %}
+                False
+              {% else %}
+                True
+              {% endif %}
             {% else %}
-              true
+              n-a
             {% endif %}
           always_finish: >-
             {% if state_attr('sensor.rest980', 'binPause') == 'true' %}
@@ -183,6 +218,27 @@ sensor:
             {% else %}
               true
             {% endif %}
+          maint_due: >-
+            {% if is_state('input_boolean.vacuum_maint_due', 'on') %}
+              true
+            {% else %}
+              false
+            {% endif %}
+          # pmap0_id I7/S9 Models
+          pmap0_id: >-
+            {% if state_attr('sensor.rest980', 'pmaps')[0] is defined %}
+              {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
+            {% else %}
+              n-a
+            {% endif %}
+          # pmap0_timestamp I7/S9 Models
+          pmap0_timestamp: >-
+            {% if state_attr('sensor.rest980', 'pmaps')[0] is defined %}
+              {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'[\w\-]+': '(\w+)'}") }}
+            {% else %}
+              n-a
+            {% endif %}
+
       vacuum_location:
         friendly_name_template: >-
           {{ state_attr('sensor.rest980', 'name') }} Location
@@ -199,7 +255,7 @@ rest_command:
     url: >-
       {{ states('input_text.vacuum_action') }}{{ command }}
     verify_ssl: !secret vacuum_verify_ssl
-    method: 'get'
+    method: "get"
     timeout: 20
   vacuum_clean:
     url: >-
@@ -303,6 +359,9 @@ input_text:
   vacuum_log:
     name: Vacuum Log Path
     initial: !secret vacuum_log
+  vacuum_dir:
+    name: Vacuum Dir Path
+    initial: !secret vacuum_dir
 
   vacuum_clean_kitchen:
     name: Kitchen
@@ -360,8 +419,8 @@ automation:
   # Initiate Selective Room Clean
   - alias: Vacuum Clean Rooms
     trigger:
-    - platform: event
-      event_type: initiate_vacuum_clean       
+      - platform: event
+        event_type: initiate_vacuum_clean
     action:
       - service: rest_command.vacuum_clean
         data_template:
@@ -390,7 +449,7 @@ automation:
         event_data:
           domain: rest_command
           service: vacuum_clean
-    condition: 
+    condition:
       condition: or
       conditions:
         - condition: template
@@ -404,62 +463,62 @@ automation:
     action:
       - service: homeassistant.update_entity
         entity_id: sensor.rest980
-  
+
   # Log Vacuum Location to File
   - alias: Vacuum Log Position
     initial_state: true
     trigger:
-        platform: state
-        entity_id: sensor.vacuum_location
-    condition: 
+      platform: state
+      entity_id: sensor.vacuum_location
+    condition:
       condition: or
       conditions:
         - condition: state
           entity_id: sensor.vacuum
-          state: 'Clean'
+          state: "Clean"
         - condition: state
           entity_id: sensor.vacuum
-          state: 'Train'
+          state: "Train"
     action:
       - service: notify.vacuumfile
-        data_template: 
+        data_template:
           message: "{{ states('sensor.vacuum_location') }}"
-               
+
   # Initialize Blank Vacuum Log File
   - alias: Vacuum Clean Log
     initial_state: true
     trigger:
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Ready'
-        to: 'Clean'
+        from: "Ready"
+        to: "Clean"
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Ready'
-        to: 'Train'
+        from: "Ready"
+        to: "Train"
     action:
       - service: shell_command.vacuum_clear_log
       - service: shell_command.vacuum_clear_image
-          
+
   # Update Vacuum Log File with Finished Status
   - alias: Vacuum Notify on Finished Cleaning
     initial_state: true
     trigger:
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Clean'
-        to: 'Ready'
+        from: "Clean"
+        to: "Ready"
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Train'
-        to: 'Ready'
+        from: "Train"
+        to: "Ready"
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Pending'
-        to: 'Ready'
+        from: "Pending"
+        to: "Ready"
     action:
       - service: notify.vacuumfile
-        data_template: 
+        data_template:
           message: "Finished"
 
   # Update Vacuum Log File with Stuck Status
@@ -470,7 +529,7 @@ automation:
       value_template: "{{ is_state_attr('sensor.vacuum', 'phase', 'Stuck') }}"
     action:
       - service: notify.vacuumfile
-        data_template: 
+        data_template:
           message: "Stuck"
 
   # Generate Complete Vacuum Map
@@ -479,20 +538,20 @@ automation:
     trigger:
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Clean'
-        to: 'Ready'
+        from: "Clean"
+        to: "Ready"
         for:
           seconds: 10
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Train'
-        to: 'Ready'
+        from: "Train"
+        to: "Ready"
         for:
           seconds: 10
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Pending'
-        to: 'Ready'
+        from: "Pending"
+        to: "Ready"
         for:
           seconds: 10
     action:
@@ -505,16 +564,17 @@ automation:
       - platform: time_pattern
         minutes: /15
       - platform: state
-        entity_id: [
-          'sensor.vacuum_maint_clean_brushes',
-          'sensor.vacuum_maint_clean_contacts',
-          'sensor.vacuum_maint_clean_filter',
-          'sensor.vacuum_maint_clean_wheel',
-          'sensor.vacuum_maint_clean_bin',
-          'sensor.vacuum_maint_replace_brushes',
-          'sensor.vacuum_maint_replace_filter',
-          'sensor.vacuum_maint_replace_wheel'
-        ]
+        entity_id:
+          [
+            "sensor.vacuum_maint_clean_brushes",
+            "sensor.vacuum_maint_clean_contacts",
+            "sensor.vacuum_maint_clean_filter",
+            "sensor.vacuum_maint_clean_wheel",
+            "sensor.vacuum_maint_clean_bin",
+            "sensor.vacuum_maint_replace_brushes",
+            "sensor.vacuum_maint_replace_filter",
+            "sensor.vacuum_maint_replace_wheel",
+          ]
     action:
       - service_template: >-
           {% set ns = namespace(count = 0) %}
@@ -528,14 +588,23 @@ automation:
           {% endif %}
         entity_id: input_boolean.vacuum_maint_due
 
+  # Delete Old Vacuum Image Files
+  - alias: Vacuum Delete Images
+    initial_state: true
+    trigger:
+      platform: time_pattern
+      hours: "00"
+    action:
+      - service: shell_command.vacuum_delete_images
+
 ###################################
 # Notify
 ###################################
 
 notify:
-    - name: VacuumFile
-      platform: file
-      filename: !secret vacuum_log
+  - name: VacuumFile
+    platform: file
+    filename: !secret vacuum_log
 
 ###################################
 # Camera
@@ -555,3 +624,27 @@ shell_command:
   vacuum_clear_log: cp /dev/null {{ states('input_text.vacuum_log') }}
   vacuum_clear_image: curl -X GET -s -O /dev/null '{{ states("input_text.vacuum_map") }}?clear=true'
   vacuum_generate_image: curl -X GET -s -O /dev/null '{{ states("input_text.vacuum_map") }}?last=true'
+  vacuum_delete_images: find {{ states('input_text.vacuum_dir') }} -regex ".*[0-9]\.png" -type f -mtime +20 -exec rm -f {} \;
+
+###################################
+# Scripts
+###################################
+
+scripts:
+  vacuum_clean:
+    sequence:
+      - service: rest_command.vacuum_clean
+        data_template:
+          payload: >
+            {
+              "ordered": 0,
+              "pmap_id": "{{ state_attr('sensor.vacuum', 'pmap0_id') | string }}",
+              "regions": [{% for boolean in states.input_boolean if 'vacuum_clean' in boolean.entity_id and is_state(boolean.entity_id, 'on') %}
+                {% set room = 'input_text.' + boolean.entity_id.split('.')[1] %} {{ states(room) | string }} {%- if not loop.last %},{%- endif %}
+                {%- endfor %}
+              ],
+              "user_pmapv_id": "{{ state_attr('sensor.vacuum', 'pmap0_timestamp') | string }}"
+            }
+      - service: input_boolean.turn_off
+        data:
+          entity_id: group.vacuum_rooms
