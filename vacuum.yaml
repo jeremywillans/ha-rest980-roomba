@@ -24,10 +24,12 @@ sensor:
     resource: !secret vacuum_state
     value_template: "OK"
     scan_interval: 10
+
+vacuum:
   - platform: template
     vacuums:
       vacuum:
-        friendly_name_template: >-
+        friendly_name: >-
           {{ state_attr('sensor.rest980', 'name') }}
         value_template: >-
           {% if state_attr('sensor.rest980', 'cleanMissionStatus')['cycle'] == 'none' and state_attr('sensor.rest980', 'cleanMissionStatus')['notReady'] == 39 %}
@@ -44,7 +46,7 @@ sensor:
           {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['cycle'] %}
           {{ mapper[state] if state in mapper else state }}
           {% endif %}
-        icon_template: mdi:robot-vacuum
+        # icon_template: mdi:robot-vacuum
         start:
           service: script.vacuum_clean
         attribute_templates:
@@ -243,7 +245,7 @@ sensor:
         friendly_name_template: >-
           {{ state_attr('sensor.rest980', 'name') }} Location
         value_template: >-
-          {{ state_attr('sensor.vacuum', 'location') }}
+          {{ state_attr('vacuum.vacuum', 'location') }}
         icon_template: mdi:home-map-marker
 
 ###################################
