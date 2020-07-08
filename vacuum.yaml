@@ -190,7 +190,7 @@ sensor:
             {% else %}
               n-a
             {% endif %}
-          power_boost: >-
+          carpet_boost: >-
             {% if state_attr('sensor.rest980', 'vacHigh') is defined %}
               {% if state_attr('sensor.rest980', 'vacHigh') == 'false' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
                 Eco
@@ -212,6 +212,12 @@ sensor:
             {% else %}
               n-a
             {% endif %}
+          always_finish: >-
+            {% if state_attr('sensor.rest980', 'binPause') == 'true' %}
+              false
+            {% else %}
+              true
+            {% endif %}
           maint_due: >-
             {% if is_state('input_boolean.vacuum_maint_due', 'on') %}
               true
@@ -232,6 +238,7 @@ sensor:
             {% else %}
               n-a
             {% endif %}
+
       vacuum_location:
         friendly_name_template: >-
           {{ state_attr('sensor.rest980', 'name') }} Location
@@ -255,8 +262,46 @@ rest_command:
       {{ states('input_text.vacuum_action') }}cleanRoom
     verify_ssl: !secret vacuum_verify_ssl
     method: POST
-    content_type: "application/json"
-    payload: "{{ payload }}"
+    content_type: 'application/json'
+    payload: '{{ payload }}'
+  vacuum_config:
+    url: >-
+      {{ states('input_text.vacuum_config') }}{{ command }}
+    verify_ssl: !secret vacuum_verify_ssl
+    method: POST
+    content_type: 'application/json'
+  vacuum_set_cleaning_passes:
+    url: >-
+      {{ states('input_text.vacuum_config') }}cleaningPasses/{{ passes }}
+    verify_ssl: !secret vacuum_verify_ssl
+    method: POST
+    content_type: 'application/json'
+  vacuum_set_carpet_boost:
+    url: >-
+      {{ states('input_text.vacuum_config') }}carpetBoost/{{ speed }}
+    verify_ssl: !secret vacuum_verify_ssl
+    method: POST
+    content_type: 'application/json'
+  vacuum_toggle_clean_edges:
+    url: >-
+      {% if state_attr('sensor.vacuum', 'clean_edges') == 'true' %}
+        {{ states('input_text.vacuum_config') }}edgeClean/off
+      {% else %}
+        {{ states('input_text.vacuum_config') }}edgeClean/on
+      {% endif %}
+    verify_ssl: !secret vacuum_verify_ssl
+    method: POST
+    content_type: 'application/json'
+  vacuum_toggle_always_finish:
+    url: >-
+      {% if state_attr('sensor.vacuum', 'always_finish') == 'true' %}
+        {{ states('input_text.vacuum_config') }}alwaysFinish/off
+      {% else %}
+        {{ states('input_text.vacuum_config') }}alwaysFinish/on
+      {% endif %}
+    verify_ssl: !secret vacuum_verify_ssl
+    method: POST
+    content_type: 'application/json'
 
 ###################################
 # Input Boolean
@@ -305,6 +350,9 @@ input_text:
   vacuum_action:
     name: Vacuum Action URL
     initial: !secret vacuum_action
+  vacuum_config:
+    name: Vacuum Config URL
+    initial: !secret vacuum_config
   vacuum_map:
     name: Vacuum Map URL
     initial: !secret vacuum_map
