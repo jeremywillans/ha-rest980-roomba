@@ -92,10 +92,12 @@ This will create a new local addon which you can install
 
 ### Step 5: Get Room Details
 
-* Initiate a Clean Rooms clean from the iRobot App, ensuring you select all **BUT** one room! (if you select them all, it wont list them out. Perform a second clean on the remaining room to get all the details)
+* Initiate a Clean Rooms clean from the iRobot App, ensuring you note the order in whcih you select the rooms (room names are no longer shown in the api)
 * Navigate to ```http://<ip or fqdn of docker host>:<rest980port>/api/local/info/state```
-* Look for the "lastCommand" section and copy down the following info 
+* Look for the "lastCommand" section and copy down the following info, noting the order as this references what you selected in the app.
     - regions
+
+**Note:** If you recreate your map, you will need to repeat this process as the region_id's will most likely change!
 
 ### Step 6: Configure Home Assistant Package and Secrets
 
@@ -106,7 +108,7 @@ I split off the regions into the secrets file to make it easier to manage for fu
 I have tried to map as many of the reported statuses, however I occasionally get an "Unknown" in the logs, if you work out another state, please post it up!
 
 **Notes:** 
-- Make sure you **remove** any trailing commads from the regions when copying them into the secrets file! You only need to copy the region ID, not the rest of the code
+- Make sure you **remove** any trailing commas from the regions when copying them into the secrets file!
 - The input_booleans and input_text entries all start with vacuum as this is used in the templates for correct mapping in lovelace
 
 > [secrets.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/secrets.yaml)
