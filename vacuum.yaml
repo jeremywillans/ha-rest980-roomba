@@ -188,7 +188,7 @@ sensor:
             {% else %}
               n-a
             {% endif %}
-          power_boost: >-
+          carpet_boost: >-
             {% if state_attr('sensor.rest980', 'vacHigh') is defined %}
               {% if state_attr('sensor.rest980', 'vacHigh') == 'false' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
                 Eco
@@ -294,6 +294,12 @@ input_boolean:
   vacuum_maint_due:
     name: Vacuum Maintenance
     icon: mdi:wrench
+  vacuum_schedule_1:
+    name: Vacuum Schedule 1
+    icon: mdi:timetable
+  vacuum_schedule_2:
+    name: Vacuum Schedule 2
+    icon: mdi:timetable
 
 ###################################
 # Input Text
@@ -312,6 +318,9 @@ input_text:
   vacuum_dir:
     name: Vacuum Dir Path
     initial: !secret vacuum_dir
+  vacuum_rooms:
+    name: Vacuum Rooms
+    max: 255
 
   vacuum_clean_kitchen:
     name: Kitchen
@@ -375,15 +384,24 @@ automation:
       - service: rest_command.vacuum_clean
         data_template:
           payload: >
+            {% set rooms = states('input_text.vacuum_rooms') %}
+            {% if rooms[-1:] == ',' %}
+            {% set rooms = rooms[:-1] %}
+            {% endif %}
+            {% set rooms = rooms.split(",") %}
             {
-              "ordered": 0,
+              "ordered": 1,
               "pmap_id": "{{ state_attr('sensor.vacuum', 'pmap0_id') | string }}",
-              "regions": [{% for boolean in states.input_boolean if 'vacuum_clean' in boolean.entity_id and is_state(boolean.entity_id, 'on') %}
-                {% set room = 'input_text.' + boolean.entity_id.split('.')[1] %} {{ states(room) | string }} {%- if not loop.last %},{%- endif %}
+              "regions": [{% for id in rooms %}
+                {% set room = 'input_text.vacuum_clean_' + id %} {{ states(room) | string }} {%- if not loop.last %},{%- endif %}
                 {%- endfor %}
               ],
               "user_pmapv_id": "{{ state_attr('sensor.vacuum', 'pmap0_timestamp') | string }}"
             }
+      - service: input_text.set_value
+        data:
+          entity_id: input_text.vacuum_rooms
+          value: ''
       - service: input_boolean.turn_off
         data:
           entity_id: group.vacuum_rooms
@@ -481,6 +499,18 @@ automation:
       - service: notify.vacuumfile
         data_template: 
           message: "Stuck"
+      - delay: 5
+      # NOTICE THIS IS VALID FOR IOS USERS ONLY!
+      - service: !secret vacuum_notify
+        data_template:
+          title: "{{ state_attr('sensor.rest980', 'name') }} requires your attention"
+          message: "{{ state_attr('sensor.rest980', 'name') }} is stuck."
+          data:
+            attachment:
+              content-type: jpeg
+            push:
+              category: camera
+            entity_id: camera.roomba 
 
   # Generate Complete Vacuum Map
   - alias: Vacuum Generate Image after Cleaning
@@ -505,7 +535,19 @@ automation:
         for:
           seconds: 10
     action:
-      service: shell_command.vacuum_generate_image
+      - service: shell_command.vacuum_generate_image
+      - delay: 5
+      # NOTICE THIS IS VALID FOR IOS USERS ONLY!
+      - service: !secret vacuum_notify
+        data_template:
+          title: "{{ state_attr('sensor.rest980', 'name') }}"
+          message: "{{ state_attr('sensor.rest980', 'name') }} successfully completed a job!"
+          data:
+            attachment:
+              content-type: jpeg
+            push:
+              category: camera
+            entity_id: camera.roomba    
 
   # Maintence Check
   - alias: Vacuum Maintenance Check
@@ -527,7 +569,7 @@ automation:
     action:
       - service_template: >-
           {% set ns = namespace(count = 0) %}
-          {% for item in states.sensor if 'vacuum_maint' in item.entity_id and (state_attr(item.entity_id, 'timeout_timestamp') < as_timestamp(now())) %}
+          {% for item in states.sensor if 'sensor.vacuum_maint' in item.entity_id and (state_attr(item.entity_id, 'timeout_timestamp') < as_timestamp(now())) %}
             {% set ns.count = loop.index %}
           {% endfor %}
           {% if ns.count > 0 %}
@@ -536,6 +578,119 @@ automation:
             input_boolean.turn_off
           {% endif %}
         entity_id: input_boolean.vacuum_maint_due
+
+  # Add Rooms for Ordered Cleaning
+  - alias: Vacuum Add Rooms for Cleaning
+    initial_state: true
+    trigger:
+      platform: state
+      entity_id: [
+        'input_boolean.vacuum_clean_kitchen',
+        'input_boolean.vacuum_clean_entry',
+        'input_boolean.vacuum_clean_hall',
+        'input_boolean.vacuum_clean_living_room',
+        'input_boolean.vacuum_clean_bathroom',
+        'input_boolean.vacuum_clean_bedroom',
+        'input_boolean.vacuum_clean_wardrobe',
+        'input_boolean.vacuum_clean_master_ensuite',
+        'input_boolean.vacuum_clean_master_bedroom',
+        'input_boolean.vacuum_clean_table'
+      ]
+      to: 'on'
+    action:
+      service: input_text.set_value
+      data_template:
+        entity_id: input_text.vacuum_rooms
+        value: |
+          {% set room = trigger.entity_id %}
+          {% set room = room.replace("input_boolean.vacuum_clean_","") %}
+          {% if ((states('input_text.vacuum_rooms') == "unknown") or (states('input_text.vacuum_rooms') == "")) %}
+            {{ room }},
+          {% else %}
+            {{ states('input_text.vacuum_rooms') }}{{ room }},
+          {% endif %}
+
+  # Remove Rooms for Ordered Cleaning
+  - alias: Vacuum Remove Rooms for Cleaning
+    initial_state: true
+    trigger:
+      platform: state
+      entity_id: [
+        'input_boolean.vacuum_clean_kitchen',
+        'input_boolean.vacuum_clean_entry',
+        'input_boolean.vacuum_clean_hall',
+        'input_boolean.vacuum_clean_living_room',
+        'input_boolean.vacuum_clean_bathroom',
+        'input_boolean.vacuum_clean_bedroom',
+        'input_boolean.vacuum_clean_wardrobe',
+        'input_boolean.vacuum_clean_master_ensuite',
+        'input_boolean.vacuum_clean_master_bedroom',
+        'input_boolean.vacuum_clean_table'
+      ]
+      to: 'off'
+    action:
+      service: input_text.set_value
+      data_template:
+        entity_id: input_text.vacuum_rooms
+        value: |
+          {% set room = trigger.entity_id %}
+          {% set room = room.replace("input_boolean.vacuum_clean_","") %}
+          {% set result = states('input_text.vacuum_rooms') %}
+          {% set result = result.replace(room + ",","") %}
+          {{ result }}
+
+  # Vacuum Cleaning Schedule 1
+  - alias: Vacuum Cleaning Schedule 1
+    initial_state: true
+    trigger:
+      platform: time_pattern
+      hours: "6"
+    condition: 
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.vacuum_schedule_1
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.vacation
+          state: 'off'
+    action:
+      - service: input_text.set_value
+        entity_id: input_text.vacuum_rooms
+        data_template: 
+          entity_id: input_text.vacuum_rooms
+          value: "kitchen"
+      - service: automation.trigger
+        entity_id: automation.vacuum_clean_rooms
+
+  # Vacuum Cleaning Schedule 2
+  - alias: Vacuum Cleaning Schedule 2
+    initial_state: true
+    trigger:
+      platform: time_pattern
+      hours: "10"
+    condition: 
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.vacuum_schedule_2
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.vacation
+          state: 'off'
+        - condition: time
+          weekday:
+            - mon
+            - wed
+            - fri
+    action:
+      - service: input_text.set_value
+        entity_id: input_text.vacuum_rooms
+        data_template: 
+          entity_id: input_text.vacuum_rooms
+          value: "kitchen,entry,hall,living_room,bathroom,bedroom,wardrobe,master_ensuite,master_bedroom"
+      - service: automation.trigger
+        entity_id: automation.vacuum_clean_rooms
 
   # Delete Old Vacuum Image Files
   - alias: Vacuum Delete Images
