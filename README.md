@@ -1,5 +1,11 @@
 # ha-rest980-roomba
 
+## NOTICE DEV BRANCH IS NOT READY FOR USE
+## THIS HAS BREAKING CHANGES IN AN ATTEMPT TO MOVE TO VACUUM DOMAIN
+## TESTING HAS NOT BEEN DONE TO CONFIRM THIS WORKS
+
+## YOU HAVE BEEN WARNED !!
+
 Home Assistant - iRobot Roomba i7+ Configuration using rest980
 
 This repository provides configuration to get an iRobot Roomba i7+ robot vacuum cleaner integrated with Home Assistant using the rest980 Docker Image!
