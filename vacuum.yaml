@@ -22,10 +22,10 @@ sensor:
       - name
       - pmaps
     resource: !secret vacuum_state
-    value_template: 'OK'
+    value_template: "OK"
     scan_interval: 10
   - platform: template
-    sensors:
+    vacuums:
       vacuum:
         friendly_name_template: >-
           {{ state_attr('sensor.rest980', 'name') }}
@@ -45,6 +45,8 @@ sensor:
           {{ mapper[state] if state in mapper else state }}
           {% endif %}
         icon_template: mdi:robot-vacuum
+        start:
+          service: script.vacuum_clean
         attribute_templates:
           battery: >-
             {{ state_attr('sensor.rest980', 'batPct') }} %
@@ -246,15 +248,15 @@ rest_command:
     url: >-
       {{ states('input_text.vacuum_action') }}{{ command }}
     verify_ssl: !secret vacuum_verify_ssl
-    method: 'get'
+    method: "get"
     timeout: 20
   vacuum_clean:
     url: >-
       {{ states('input_text.vacuum_action') }}cleanRoom
     verify_ssl: !secret vacuum_verify_ssl
     method: POST
-    content_type: 'application/json'
-    payload: '{{ payload }}'
+    content_type: "application/json"
+    payload: "{{ payload }}"
 
 ###################################
 # Input Boolean
@@ -369,8 +371,8 @@ automation:
   # Initiate Selective Room Clean
   - alias: Vacuum Clean Rooms
     trigger:
-    - platform: event
-      event_type: initiate_vacuum_clean       
+      - platform: event
+        event_type: initiate_vacuum_clean
     action:
       - service: rest_command.vacuum_clean
         data_template:
@@ -399,7 +401,7 @@ automation:
         event_data:
           domain: rest_command
           service: vacuum_clean
-    condition: 
+    condition:
       condition: or
       conditions:
         - condition: template
@@ -413,62 +415,62 @@ automation:
     action:
       - service: homeassistant.update_entity
         entity_id: sensor.rest980
-  
+
   # Log Vacuum Location to File
   - alias: Vacuum Log Position
     initial_state: true
     trigger:
-        platform: state
-        entity_id: sensor.vacuum_location
-    condition: 
+      platform: state
+      entity_id: sensor.vacuum_location
+    condition:
       condition: or
       conditions:
         - condition: state
           entity_id: sensor.vacuum
-          state: 'Clean'
+          state: "Clean"
         - condition: state
           entity_id: sensor.vacuum
-          state: 'Train'
+          state: "Train"
     action:
       - service: notify.vacuumfile
-        data_template: 
+        data_template:
           message: "{{ states('sensor.vacuum_location') }}"
-               
+
   # Initialize Blank Vacuum Log File
   - alias: Vacuum Clean Log
     initial_state: true
     trigger:
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Ready'
-        to: 'Clean'
+        from: "Ready"
+        to: "Clean"
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Ready'
-        to: 'Train'
+        from: "Ready"
+        to: "Train"
     action:
       - service: shell_command.vacuum_clear_log
       - service: shell_command.vacuum_clear_image
-          
+
   # Update Vacuum Log File with Finished Status
   - alias: Vacuum Notify on Finished Cleaning
     initial_state: true
     trigger:
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Clean'
-        to: 'Ready'
+        from: "Clean"
+        to: "Ready"
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Train'
-        to: 'Ready'
+        from: "Train"
+        to: "Ready"
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Pending'
-        to: 'Ready'
+        from: "Pending"
+        to: "Ready"
     action:
       - service: notify.vacuumfile
-        data_template: 
+        data_template:
           message: "Finished"
 
   # Update Vacuum Log File with Stuck Status
@@ -479,7 +481,7 @@ automation:
       value_template: "{{ is_state_attr('sensor.vacuum', 'phase', 'Stuck') }}"
     action:
       - service: notify.vacuumfile
-        data_template: 
+        data_template:
           message: "Stuck"
 
   # Generate Complete Vacuum Map
@@ -488,20 +490,20 @@ automation:
     trigger:
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Clean'
-        to: 'Ready'
+        from: "Clean"
+        to: "Ready"
         for:
           seconds: 10
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Train'
-        to: 'Ready'
+        from: "Train"
+        to: "Ready"
         for:
           seconds: 10
       - platform: state
         entity_id: sensor.vacuum
-        from: 'Pending'
-        to: 'Ready'
+        from: "Pending"
+        to: "Ready"
         for:
           seconds: 10
     action:
@@ -514,16 +516,17 @@ automation:
       - platform: time_pattern
         minutes: /15
       - platform: state
-        entity_id: [
-          'sensor.vacuum_maint_clean_brushes',
-          'sensor.vacuum_maint_clean_contacts',
-          'sensor.vacuum_maint_clean_filter',
-          'sensor.vacuum_maint_clean_wheel',
-          'sensor.vacuum_maint_clean_bin',
-          'sensor.vacuum_maint_replace_brushes',
-          'sensor.vacuum_maint_replace_filter',
-          'sensor.vacuum_maint_replace_wheel'
-        ]
+        entity_id:
+          [
+            "sensor.vacuum_maint_clean_brushes",
+            "sensor.vacuum_maint_clean_contacts",
+            "sensor.vacuum_maint_clean_filter",
+            "sensor.vacuum_maint_clean_wheel",
+            "sensor.vacuum_maint_clean_bin",
+            "sensor.vacuum_maint_replace_brushes",
+            "sensor.vacuum_maint_replace_filter",
+            "sensor.vacuum_maint_replace_wheel",
+          ]
     action:
       - service_template: >-
           {% set ns = namespace(count = 0) %}
@@ -551,9 +554,9 @@ automation:
 ###################################
 
 notify:
-    - name: VacuumFile
-      platform: file
-      filename: !secret vacuum_log
+  - name: VacuumFile
+    platform: file
+    filename: !secret vacuum_log
 
 ###################################
 # Camera
@@ -574,3 +577,26 @@ shell_command:
   vacuum_clear_image: curl -X GET -s -O /dev/null '{{ states("input_text.vacuum_map") }}?clear=true'
   vacuum_generate_image: curl -X GET -s -O /dev/null '{{ states("input_text.vacuum_map") }}?last=true'
   vacuum_delete_images: find {{ states('input_text.vacuum_dir') }} -regex ".*[0-9]\.png" -type f -mtime +20 -exec rm -f {} \;
+
+###################################
+# Scripts
+###################################
+
+scripts:
+  vacuum_clean:
+    sequence:
+      - service: rest_command.vacuum_clean
+        data_template:
+          payload: >
+            {
+              "ordered": 0,
+              "pmap_id": "{{ state_attr('sensor.vacuum', 'pmap0_id') | string }}",
+              "regions": [{% for boolean in states.input_boolean if 'vacuum_clean' in boolean.entity_id and is_state(boolean.entity_id, 'on') %}
+                {% set room = 'input_text.' + boolean.entity_id.split('.')[1] %} {{ states(room) | string }} {%- if not loop.last %},{%- endif %}
+                {%- endfor %}
+              ],
+              "user_pmapv_id": "{{ state_attr('sensor.vacuum', 'pmap0_timestamp') | string }}"
+            }
+      - service: input_boolean.turn_off
+        data:
+          entity_id: group.vacuum_rooms
