@@ -86,7 +86,9 @@ http://<ip or fqdn of docker host>:<port>/api/local/info/state
 - Install and configure the php-nginx addon.
 - Start rest980 and php-nginx
 
-**Note**: You can also run this locally by creating a rest980 (or similar) folder within "addons/local" and then copying the config.json files from each folder on my [hass-addons](https://github.com/jeremywillans/hass-addons/) repository. 
+**Note** There are two copies of each addon listed, these allow you to run a second robot (or bravva), you do not need these if you only have 1 unit!
+
+**Alternative**: You can also run these locally by creating a rest980 (or similar) folder within "addons/local" and then copying the contents from each folder on my [hass-addons](https://github.com/jeremywillans/hass-addons/) repository. 
 
 This will create a new local addon which you can install
 
