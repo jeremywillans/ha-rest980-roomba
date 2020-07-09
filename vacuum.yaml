@@ -121,7 +121,7 @@ sensor:
               n-a
             {% endif %}
           total_jobs: >-
-            {% if state_attr('sensor.rest980', 'bbrun')['nMssn'] is defined %}
+            {% if state_attr('sensor.rest980', 'bbmssn')['nMssn'] is defined %}
               {{ state_attr('sensor.rest980', 'bbmssn')['nMssn'] }}
             {% else %}
               n-a
