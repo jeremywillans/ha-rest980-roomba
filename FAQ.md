@@ -31,6 +31,20 @@ vacuum_kitchen: '{"region_id": "16"},'  <-- BAD - EXTRA COMMA
 vacuum_kitchen: '{"region_id": "16"}}'  <-- BAD - EXTRA BRACKET
 ```
 
+If the regions all appear correct, then the next culprit is that the is a mis-match between the map_id values for rest980 and the iRobot App.
+
+You can verify these using this process
+* Start a selective clean from the iRobot App
+* Navigate to ```http://<ip or fqdn of docker host>:<rest980port>/api/local/info/state```
+* Look for the "lastCommand" section, and note the user_pmapv_id value
+* Compare this value against the value HA is reporting (listed as an attribute on sensor.vacuum)
+
+If the values dont match, try the following suggestions to bring them back in-sync.
+* Update your map from the iRobot App (add a blockzone, rename a room, etc.)
+* Remove the Roomba from your iRobot App and re-add.
+
+*Note* After perform these steps, verify that the iRobot Region ID values align with whats defined in HA! (Refer Step 5 for details)
+
 ### 4. PHP File downloads instead of rendering
 
 HA / HA Core does not have in-built PHP Support. You need to deploy a php compatible web server to host this image.
