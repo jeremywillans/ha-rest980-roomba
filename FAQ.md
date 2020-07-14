@@ -43,7 +43,7 @@ If the values dont match, try the following suggestions to bring them back in-sy
 * Update your map from the iRobot App (add a blockzone, rename a room, etc.)
 * Remove the Roomba from your iRobot App and re-add.
 
-*Note* After perform these steps, verify that the iRobot Region ID values align with whats defined in HA! (Refer Step 5 for details)
+**Note** After perform these steps, verify that the iRobot Region ID values align with whats defined in HA! (Refer Step 5 for details)
 
 ### 4. PHP File downloads instead of rendering
 
