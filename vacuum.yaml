@@ -359,6 +359,7 @@ input_text:
 
 group:
   vacuum_rooms:
+    entities:
     - input_boolean.vacuum_clean_kitchen
     - input_boolean.vacuum_clean_entry
     - input_boolean.vacuum_clean_hall
