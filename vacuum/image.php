@@ -120,13 +120,13 @@ foreach($coords as $i => $coord) {
   $blue = ($color_blue === -1 ? $part : $color_blue);
   
   $color = imagecolorallocate($image, $red, $green, $blue);
-  $x = $split[1]+$x_offset;
-  $y = $split[0]+$y_offset;
+  $tmpx = $split[1]+$x_offset;
+  $tmpy = $split[0]+$y_offset;
   $theta = $split[2];
   
   // Rotate Calculations
-  $x=($x*cos(deg2rad($rotate_angle))+$y*sin(deg2rad($rotate_angle)))*$scale;
-  $y=(-1*$x*sin(deg2rad($rotate_angle))+$y*cos(deg2rad($rotate_angle)))*$scale;
+  $x=($tmpx*cos(deg2rad($rotate_angle))+$tmpy*sin(deg2rad($rotate_angle)))*$scale;
+  $y=(-1*$tmpx*sin(deg2rad($rotate_angle))+$tmpy*cos(deg2rad($rotate_angle)))*$scale;
   
   $boxsize=4;
   $shift_y = 2;
