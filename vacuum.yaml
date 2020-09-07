@@ -31,7 +31,9 @@ sensor:
           {{ state_attr('sensor.rest980', 'name') }}
         value_template: >-
           {% if state_attr('sensor.rest980', 'cleanMissionStatus')['cycle'] == 'none' and state_attr('sensor.rest980', 'cleanMissionStatus')['notReady'] == 39 %}
-              Pending
+            Pending
+          {% elif state_attr('sensor.rest980', 'cleanMissionStatus')['notReady'] > 0 %}
+            Not Ready
           {% else %}
           {% set mapper =  {
             'clean' : 'Clean',
@@ -46,6 +48,13 @@ sensor:
           {% endif %}
         icon_template: mdi:robot-vacuum
         attribute_templates:
+          message: >-
+            {% set mapper =  {
+              2 : 'Uneven Ground',
+              15 : 'Low Battery',
+              39 : 'Pending' } %}
+            {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['notReady'] %}
+            {{ mapper[state] if state in mapper else 'n-a' }}
           battery: >-
             {{ state_attr('sensor.rest980', 'batPct') }} %
           phase: >-
@@ -212,21 +221,14 @@ sensor:
             {% endif %}
           maint_due: >-
             {% if is_state('input_boolean.vacuum_maint_due', 'on') %}
-              true
+              True
             {% else %}
-              false
+              False
             {% endif %}
           # pmap0_id I7/S9 Models
           pmap0_id: >-
             {% if state_attr('sensor.rest980', 'pmaps')[0] is defined %}
               {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
-            {% else %}
-              n-a
-            {% endif %}
-          # pmap0_timestamp I7/S9 Models
-          pmap0_timestamp: >-
-            {% if state_attr('sensor.rest980', 'pmaps')[0] is defined %}
-              {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'[\w\-]+': '(\w+)'}") }}
             {% else %}
               n-a
             {% endif %}
@@ -396,8 +398,7 @@ automation:
               "regions": [{% for id in rooms %}
                 {% set room = 'input_text.vacuum_clean_' + id %} {{ states(room) | string }} {%- if not loop.last %},{%- endif %}
                 {%- endfor %}
-              ],
-              "user_pmapv_id": "{{ state_attr('sensor.vacuum', 'pmap0_timestamp') | string }}"
+              ]
             }
       - service: input_text.set_value
         data:
