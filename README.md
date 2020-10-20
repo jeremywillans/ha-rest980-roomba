@@ -149,7 +149,7 @@ Simply delete the "latest.png" file in the vacuum directory to force map regener
 
 ### Step 10: Create Vacuum Maintenace Sensors
 
-You will need to create the Maintenance Sensors - simply expand the Maintenance dropdown in Lovelace and click the green check next to each item to create these.
+You will need to create the Maintenance Sensors - simply expand the Maintenance dropdown in Lovelace and click the green check next to each item to create these. You might need to click on them **twice** to reset the time to zero.
 
 **Note:** check-button-card is assuming you have [MQTT Discovery](https://www.home-assistant.io/docs/mqtt/discovery/) enabled using the default discovery prefix of "homeassistant"
 If you have a different discovery prefix defined - such as "smartthings" - please add the following to each of the Maintenance Tasks in Lovelace
@@ -167,6 +167,22 @@ If you have a different discovery prefix defined - such as "smartthings" - pleas
   type: 'custom:check-button-card'
   discovery_prefix: smartthings <--------------- THIS
   visibility_timeout: 10 days
+```
+
+### Step 12: Update Recorder
+
+To prevent the database from storing unrequired data, the below privides an example of suggested exclusions you can add to your [recorder](https://www.home-assistant.io/integrations/recorder/#common-filtering-examples) component within your configuration.yaml file
+
+```
+recorder:
+  <existing code here, if any>
+  exclude:
+    entities_glob:
+      - sensor.vacuum_*
+      - automation.vacuum_*
+    entities:
+      - sensor.rest980
+      - camera.roomba
 ```
 
 ### Step 11: Enjoy!
