@@ -56,6 +56,8 @@ This repo makes use of the php-nginx docker image (available as a HA Addon) to a
 Make sure you have MQTT and [MQTT Discovery](https://www.home-assistant.io/docs/mqtt/discovery/) running in your HA Environmnent
 If you use a different discovery prefix defined - such as "smartthings" - you will need to update each of the check-button-card entries in Lovelace.
 
+You might need to click on them **twice** to reset the time to zero.
+
 ```
 - entity: sensor.vacuum_maint_clean_brushes
   severity:
