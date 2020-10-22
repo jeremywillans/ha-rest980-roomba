@@ -177,7 +177,7 @@ To prevent the database from storing unrequired data, the below privides an exam
 recorder:
   <existing code here, if any>
   exclude:
-    entities_glob:
+    entity_globs:
       - sensor.vacuum_*
       - automation.vacuum_*
     entities:
