@@ -110,6 +110,19 @@ To cover the 'overspray' caused in this mode, it is recommended to duplicate you
 If your having issues with MQTT sensors, you can check the sensors directly on your MQTT Brokker using [MQTT Explorer](http://mqtt-explorer.com/).
 If in doubt, delete the sensor (with state and config topic) and recreate from Lovelace using the check-button-card.
 
+### 11. Map Creation Process
+
+The following steps outline the process used to generate the map
+
+- You start cleaning
+- Vacuum Clean Log automation executes. This calls the shell command vacuum_clear_log which writes over the vacuum.log file and then calls shell command vacuum_clear_image which in turn calls /image.php?clear=true which removes the latest.png file in the vacuum directory.
+- Vacuum Update Location executes every 2 seconds
+- When a location update is detected by Vacuum Log Position it writes this to the log file
+- If Stuck, Vacuum Notify on Stuck Status executes and writes “Stuck” into the log file
+- When finished, Vacuum Notify on Finished Cleaning executes and writes “Finished” to the log file
+- 10 seconds after finished cleaning Vacuum Generate Image after Cleaning executes and calls the shell command vacuum_generate_image, which in turn calls /image.php?last=true which generates latest.png and .png files in the vacuum directory. you can test this manaully to make sure its not a permissions issue.
+
+
 ## Support
 
 Got questions? Please post them [here][forum].
