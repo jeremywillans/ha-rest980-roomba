@@ -122,6 +122,7 @@ The following steps outline the process used to generate the map
 - When finished, Vacuum Notify on Finished Cleaning executes and writes “Finished” to the log file
 - 10 seconds after finished cleaning Vacuum Generate Image after Cleaning executes and calls the shell command vacuum_generate_image, which in turn calls /image.php?last=true which generates latest.png and .png files in the vacuum directory. you can test this manaully to make sure its not a permissions issue.
 
+Make sure all these automations are correctly firing and check your homeassistant log file for any potential errors being generated
 
 ## Support
 
