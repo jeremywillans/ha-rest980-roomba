@@ -68,8 +68,8 @@ docker network create docker
 ```
 **DOCKER RUN**
 ```
-docker run -e BLID=myuser -e PASSWORD=mypass -e ROBOT_IP=myrobotIP -e FIRMWARE_VERSION=2 -p 3000:3000 koalazak/rest980:latest
-docker run -p 3001:80 -v /<HA_CONFIG>/roomba:/app webhippie/php-nginx:latest
+docker run -name rest980 -e BLID=myuser -e PASSWORD=mypass -e ROBOT_IP=myrobotIP -e FIRMWARE_VERSION=2 -p 3000:3000 koalazak/rest980:latest
+docker run -name php-nginx -p 3001:8080 -v /<HA_CONFIG>/roomba:/app -e NGINX_WEBROOT=/app webhippie/php-nginx:latest
 ```
 **PORTAINER-IN-HASSIO**
 > [docker-portainer-stack.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/docker-portainer-stack.yaml)
