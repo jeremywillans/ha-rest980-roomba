@@ -26,9 +26,9 @@ Make sure you have accurately copied your regions into the secrets.yaml file!
 Check for trailing commands or brackets as these will **break** the code
 
 ```
-vacuum_kitchen: '{"region_id": "16"}'   <-- GOOD
-vacuum_kitchen: '{"region_id": "16"},'  <-- BAD - EXTRA COMMA
-vacuum_kitchen: '{"region_id": "16"}}'  <-- BAD - EXTRA BRACKET
+vacuum_kitchen: '{"region_id": "16", "type": "rid"}'   <-- GOOD
+vacuum_kitchen: '{"region_id": "16", "type": "rid",}'  <-- BAD - EXTRA COMMA
+vacuum_kitchen: '{"region_id": "16", "type": "rid"}}'  <-- BAD - EXTRA BRACKET
 ```
 
 If the regions all appear correct, then the next culprit is that the is a mis-match between the map_id values for rest980 and the iRobot App.

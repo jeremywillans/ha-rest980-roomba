@@ -293,6 +293,9 @@ input_boolean:
   vacuum_clean_table:
     name: Table
     icon: mdi:room-service
+  vacuum_clean_zone_fridge:
+    name: Fridge Zone
+    icon: mdi:fridge
   vacuum_maint_due:
     name: Vacuum Maintenance
     icon: mdi:wrench
@@ -354,6 +357,9 @@ input_text:
   vacuum_clean_table:
     name: Table
     initial: !secret vacuum_table
+  vacuum_clean_zone_fridge:
+    name: Fridge Zone
+    initial: !secret vacuum_cz_fridge
 
 ###################################
 # Group
@@ -372,6 +378,7 @@ group:
     - input_boolean.vacuum_clean_master_ensuite
     - input_boolean.vacuum_clean_master_bedroom
     - input_boolean.vacuum_clean_table
+    - vacuum_clean_zone_fridge
 
 ###################################
 # Automation
@@ -569,7 +576,7 @@ automation:
           'sensor.vacuum_maint_replace_wheel'
         ]
     action:
-      - service_template: >-
+      - service: >-
           {% set ns = namespace(count = 0) %}
           {% for item in states.sensor if 'sensor.vacuum_maint' in item.entity_id and (state_attr(item.entity_id, 'timeout_timestamp') < as_timestamp(now())) %}
             {% set ns.count = loop.index %}
@@ -596,7 +603,8 @@ automation:
         'input_boolean.vacuum_clean_wardrobe',
         'input_boolean.vacuum_clean_master_ensuite',
         'input_boolean.vacuum_clean_master_bedroom',
-        'input_boolean.vacuum_clean_table'
+        'input_boolean.vacuum_clean_table',
+        'input_boolean.vacuum_clean_zone_fridge'
       ]
       to: 'on'
     action:
@@ -627,7 +635,8 @@ automation:
         'input_boolean.vacuum_clean_wardrobe',
         'input_boolean.vacuum_clean_master_ensuite',
         'input_boolean.vacuum_clean_master_bedroom',
-        'input_boolean.vacuum_clean_table'
+        'input_boolean.vacuum_clean_table',
+        'input_boolean.vacuum_clean_zone_fridge'
       ]
       to: 'off'
     action:

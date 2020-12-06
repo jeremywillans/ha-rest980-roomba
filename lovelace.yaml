@@ -13,6 +13,7 @@ cards:
       - input_boolean.vacuum_clean_master_ensuite
       - input_boolean.vacuum_clean_master_bedroom
       - input_boolean.vacuum_clean_table
+      - input_boolean.vacuum_clean_zone_fridge
       - entity: automation.vacuum_clean_rooms
         lock:
           enabled: |

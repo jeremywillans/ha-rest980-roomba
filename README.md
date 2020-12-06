@@ -97,7 +97,7 @@ This will create a new local addon which you can install
 * Initiate a Clean Rooms clean from the iRobot App, ensuring you note the order in which you select the rooms (room names are no longer shown in the api)
 * Navigate to ```http://<ip or fqdn of docker host>:<rest980port>/api/local/info/state```
 * Look for the "lastCommand" section and copy down the following info, noting the order as this references what you selected in the app.
-    - regions
+    - regions (type "rid" is Room, type "zid" is Zone)
 
 **Note:** If you recreate your map, you will need to repeat this process as the region_id's will most likely change!
 
