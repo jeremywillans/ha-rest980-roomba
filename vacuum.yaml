@@ -50,11 +50,13 @@ sensor:
         attribute_templates:
           message: >-
             {% set mapper =  {
+              0 : 'n-a',
               2 : 'Uneven Ground',
               15 : 'Low Battery',
-              39 : 'Pending' } %}
+              39 : 'Pending',
+              48 : 'Path Blocked' } %}
             {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['notReady'] %}
-            {{ mapper[state] if state in mapper else 'n-a' }}
+            {{ mapper[state] if state in mapper else state }}
           battery: >-
             {{ state_attr('sensor.rest980', 'batPct') }} %
           phase: >-
