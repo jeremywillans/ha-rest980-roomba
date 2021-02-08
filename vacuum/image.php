@@ -17,7 +17,8 @@ $y_offset = 220;
 $flip_vertical = false;
 $flip_horizontal = false;
 $rotate_angle = 0; # Allows rotating of the roomba lines
-$scale=1.00; # Allows scaling of roomba lines
+$x_scale=1.00; # Allows scaling of roomba x lines
+$y_scale=1.00; # Allows scaling of roomba y lines
 $ha_rest980 = 'https://<ip or fqdn of home assistant>:<haport>/api/states/sensor.rest980';
 $ha_token = '<ha_long_live_token>';
 $ha_timezone = 'Australia/Brisbane'; # Supported Timezones https://www.php.net/manual/en/timezones.php
@@ -125,8 +126,8 @@ foreach($coords as $i => $coord) {
   $theta = $split[2];
   
   // Rotate Calculations
-  $x=($tmpx*cos(deg2rad($rotate_angle))+$tmpy*sin(deg2rad($rotate_angle)))*$scale;
-  $y=(-1*$tmpx*sin(deg2rad($rotate_angle))+$tmpy*cos(deg2rad($rotate_angle)))*$scale;
+  $x=($tmpx*cos(deg2rad($rotate_angle))+$tmpy*sin(deg2rad($rotate_angle)))*$x_scale;
+  $y=(-1*$tmpx*sin(deg2rad($rotate_angle))+$tmpy*cos(deg2rad($rotate_angle)))*$y_scale;
   
   $boxsize=4;
   $shift_y = 2;
