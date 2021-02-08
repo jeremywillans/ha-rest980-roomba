@@ -380,7 +380,7 @@ group:
     - input_boolean.vacuum_clean_master_ensuite
     - input_boolean.vacuum_clean_master_bedroom
     - input_boolean.vacuum_clean_table
-    - vacuum_clean_zone_fridge
+    - input_boolean.vacuum_clean_zone_fridge
 
 ###################################
 # Automation
