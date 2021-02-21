@@ -57,6 +57,11 @@ $coords = str_replace("(", "", $coords);
 $coords = str_replace(")", "", $coords);
 $coords = explode("\n", $coords);
 
+if (count($coords) < 2) {
+  echo "No Coordinates found in file, is it populated?";
+  die();
+}
+
 $date = strtotime(substr($coords[0], 42));
 
 $lastline = $coords[sizeof($coords)-2];
