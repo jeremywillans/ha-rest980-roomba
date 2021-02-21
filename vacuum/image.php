@@ -47,10 +47,6 @@ if(is_file("latest.png")&&!isset($_GET['last'])) {
   echo file_get_contents("latest.png");
   die();
 }
-if (!(file_exists($vacuum_log))) {
-  echo "Unable to access $vacuum_log. Verify this file exists and can be reached.";
-  die();
-}
 
 $coords = file_get_contents($vacuum_log."?v=".time());
 $coords = str_replace("(", "", $coords);
@@ -58,7 +54,7 @@ $coords = str_replace(")", "", $coords);
 $coords = explode("\n", $coords);
 
 if (count($coords) < 2) {
-  echo "No Coordinates found in file, is it populated?";
+  echo "No Coordinates found in file, is it reachable and populated? Log file - $vacuum_log?";
   die();
 }
 
