@@ -124,6 +124,19 @@ The following steps outline the process used to generate the map
 
 Make sure all these automations are correctly firing and check your homeassistant log file for any potential errors being generated
 
+### 12. Ordered Cleaning / Scheduled Automations
+
+With the introduction of ordered cleaning, how you select rooms has been reengineered to also work from this integration which is briefly explained as 
+
+- Turn on Input Boolean (e.g. input_boolean.vacuum_clean_kitchen)
+- "Vacuum Add Rooms for Cleaning" automation detects this and adds the text *AFTER* the vacuum_clean_ section (i.e. kitchen) and a comma to the end of input_text.vacuum_rooms
+- Repeat for all rooms added (i.e. - kitchen,bathroom,bedroom)
+- If you turn off an Input Boolean, via "Vacuum Remove Rooms for Cleaning" automation, this text is removed from input_text.vacuum_rooms
+- When you have make the appropiate choices, then input_text.vacuum_rooms will contain the correctly ordered listing of rooms for cleaning.
+
+The scheduled automations simply define the ordered selections for this field (input_text.vacuum_rooms) and then call the "Vacuum Clean Rooms" automation.
+
+
 ## Support
 
 Got questions? Please post them [here][forum].
