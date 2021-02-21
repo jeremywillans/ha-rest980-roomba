@@ -510,18 +510,21 @@ automation:
       - service: notify.vacuumfile
         data_template: 
           message: "Stuck"
+      # DELETE BELOW SECTION IF YOU DONT WANT NOTIFICATIONS
       - delay: 5
-      # NOTICE THIS IS VALID FOR IOS USERS ONLY!
       - service: !secret vacuum_notify
         data_template:
           title: "{{ state_attr('sensor.rest980', 'name') }} requires your attention"
           message: "{{ state_attr('sensor.rest980', 'name') }} is stuck."
+          # =============
+          # NOTICE THIS SECTION IS VALID FOR IOS USERS ONLY!
           data:
             attachment:
               content-type: jpeg
             push:
               category: camera
-            entity_id: camera.roomba 
+            entity_id: camera.roomba
+          # =============
 
   # Generate Complete Vacuum Map
   - alias: Vacuum Generate Image after Cleaning
@@ -547,18 +550,21 @@ automation:
           seconds: 10
     action:
       - service: shell_command.vacuum_generate_image
+      # DELETE BELOW SECTION IF YOU DONT WANT NOTIFICATIONS
       - delay: 5
-      # NOTICE THIS IS VALID FOR IOS USERS ONLY!
       - service: !secret vacuum_notify
         data_template:
           title: "{{ state_attr('sensor.rest980', 'name') }}"
           message: "{{ state_attr('sensor.rest980', 'name') }} successfully completed a job!"
+          # =============
+          # NOTICE THIS SECTION IS VALID FOR IOS USERS ONLY!
           data:
             attachment:
               content-type: jpeg
             push:
               category: camera
-            entity_id: camera.roomba    
+            entity_id: camera.roomba
+          # =============
 
   # Maintence Check
   - alias: Vacuum Maintenance Check

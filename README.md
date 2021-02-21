@@ -109,12 +109,20 @@ I split off the regions into the secrets file to make it easier to manage for fu
 
 I have tried to map as many of the reported statuses, however I occasionally get an "Unknown" in the logs, if you work out another state, please post it up!
 
+I have included notification options (with optional inclusion of the map for IOS users), these can be deleted from vacuum.yaml if not needed
+
 **Notes:** 
 - Make sure you **remove** any trailing commas from the regions when copying them into the secrets file!
 - The input_booleans and input_text entries all start with vacuum as this is used in the templates for correct mapping in lovelace
 
 > [secrets.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/secrets.yaml)
 > [vacuum.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/vacuum.yaml)
+
+You will **NEED** to update the following items to match the rooms you have used
+- Secret, Input Boolean and Input Text per room/zone
+- Group "Vacuum_Rooms"
+- Automation "Vacuum Add Rooms for Cleaning" Ttrigger entities
+- Automation "Vacuum Remove Rooms for Cleaning" trigger entities
 
 ### Step 7: Configure Map Options
 
@@ -133,6 +141,9 @@ Note: This config is shown as the two cards used
 - Picture Glance
 
 > [lovelace.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/lovelace.yaml)
+
+You will **NEED** to update the following items to match the rooms you have used
+- Input Boolean per room/zone
 
 ### Step 9: Update Map Options
 
