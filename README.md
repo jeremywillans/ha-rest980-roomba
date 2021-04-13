@@ -15,6 +15,8 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 
 ## Setup Instructions
 
+The instructions included below don't specifcially ontain testing/confirmation per step. Please complete all the steps before perfomring any validation testing.
+
 ### Step 1: Prerequesites
 
 Before completing any of the below steps, you need to first configure your rooms/zones using the iRobot App!
