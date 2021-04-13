@@ -17,6 +17,8 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 
 ### Step 1: Prerequesites
 
+Before completing any of the below steps, you need to first configure your rooms/zones using the iRobot App!
+
 The following custom components are used in this deployment - these can be installed from HACS
 - [roomba-vacuum-card] - Custom Plugin Repository
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod)
