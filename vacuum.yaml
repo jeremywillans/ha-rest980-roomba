@@ -48,7 +48,7 @@ sensor:
           {% endif %}
         icon_template: mdi:robot-vacuum
         attribute_templates:
-          message: >-
+          notready_msg: >-
             {% set mapper =  {
               0 : 'n-a',
               2 : 'Uneven Ground',
@@ -56,6 +56,13 @@ sensor:
               39 : 'Pending',
               48 : 'Path Blocked' } %}
             {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['notReady'] %}
+            {{ mapper[state] if state in mapper else state }}
+          error_msg: >-
+            {% set mapper =  {
+              0 : 'n-a',
+              15 : 'Reboot Required',
+              18 : 'Docking Issue'} %}
+            {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['error'] %}
             {{ mapper[state] if state in mapper else state }}
           battery: >-
             {{ state_attr('sensor.rest980', 'batPct') }} %
