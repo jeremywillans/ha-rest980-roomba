@@ -87,6 +87,9 @@ http://<ip or fqdn of docker host>:<port>/api/local/info/state
 - Add the following Github Repository to your HA Add-on Store
   https://github.com/jeremywillans/hass-addons
 - Install the rest980 addon, then update and save the configuration options 
+
+    **NOTE** Rest980 Firmware option 2 implies 2+ (inclusive of 3.x)
+
 - Install and configure the php-nginx addon.
 - Start rest980 and php-nginx
 
