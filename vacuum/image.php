@@ -16,6 +16,7 @@ $x_offset = 220;
 $y_offset = 220;
 $flip_vertical = false;
 $flip_horizontal = false;
+$render_status_text = true;
 $rotate_angle = 0; # Allows rotating of the roomba lines
 $x_scale=1.00; # Allows scaling of roomba x lines
 $y_scale=1.00; # Allows scaling of roomba y lines
@@ -35,6 +36,8 @@ $color_blue = -1;
 // red = -1 , green = 255 , blue = -1  ---> Green to White Fade
 // red = 0 , green = -1 , blue = 255   ---> Blue to Aqua Fade
 // red = 0 , green = 0 , blue = 255    ---> Solid Blue
+//
+$path_opacity = 0.5; # Opacity of Roomba path --> 0.0 = completely transparent, 1.0 = completely opaque
 //
 ///////////////////////////////////////////////////////////////////
 
@@ -125,7 +128,8 @@ foreach($coords as $i => $coord) {
   $green = ($color_green === -1 ? $part : $color_green);
   $blue = ($color_blue === -1 ? $part : $color_blue);
   
-  $color = imagecolorallocate($image, $red, $green, $blue);
+  $alpha = (1.0 - $path_opacity) * 127;
+  $color = imagecolorallocatealpha($image, $red, $green, $blue, $alpha);
   $tmpx = $split[1]+$x_offset;
   $tmpy = $split[0]+$y_offset;
   $theta = $split[2];
@@ -237,12 +241,14 @@ else {
   $status="Running";
 }
 
-date_default_timezone_set($ha_timezone);
-$dt = date('H:i:s Y-m-d', $date);
-$txt = " Started: ".$dt.$ha_text_delimiter." Status: ".$status.$string;
-$white = imagecolorallocate($dest, 255, 255, 255);
-$font = "./monaco.ttf"; 
-imagettftext($dest, 10, 0, 5, 15, $white, $font, $txt);
+if ($render_status_text) {
+  date_default_timezone_set($ha_timezone);
+  $dt = date('H:i:s Y-m-d', $date);
+  $txt = " Started: ".$dt.$ha_text_delimiter." Status: ".$status.$string;
+  $white = imagecolorallocate($dest, 255, 255, 255);
+  $font = "./monaco.ttf";
+  imagettftext($dest, 10, 0, 5, 15, $white, $font, $txt);
+} 
 
 header("Content-Type: image/png");
 imagepng($dest);
