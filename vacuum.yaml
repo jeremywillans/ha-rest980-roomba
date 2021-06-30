@@ -404,17 +404,17 @@ input_text:
 group:
   vacuum_rooms:
     entities:
-    - input_boolean.vacuum_clean_kitchen
-    - input_boolean.vacuum_clean_entry
-    - input_boolean.vacuum_clean_hall
-    - input_boolean.vacuum_clean_living_room
-    - input_boolean.vacuum_clean_bathroom
-    - input_boolean.vacuum_clean_bedroom
-    - input_boolean.vacuum_clean_wardrobe
-    - input_boolean.vacuum_clean_master_ensuite
-    - input_boolean.vacuum_clean_master_bedroom
-    - input_boolean.vacuum_clean_table
-    - input_boolean.vacuum_clean_zone_fridge
+      - input_boolean.vacuum_clean_kitchen
+      - input_boolean.vacuum_clean_entry
+      - input_boolean.vacuum_clean_hall
+      - input_boolean.vacuum_clean_living_room
+      - input_boolean.vacuum_clean_bathroom
+      - input_boolean.vacuum_clean_bedroom
+      - input_boolean.vacuum_clean_wardrobe
+      - input_boolean.vacuum_clean_master_ensuite
+      - input_boolean.vacuum_clean_master_bedroom
+      - input_boolean.vacuum_clean_table
+      - input_boolean.vacuum_clean_zone_fridge
 
 ###################################
 # Automation
@@ -425,7 +425,13 @@ automation:
   - alias: Vacuum Clean Rooms
     trigger:
     - platform: event
-      event_type: initiate_vacuum_clean       
+      event_type: initiate_vacuum_clean
+    condition:
+      condition: not
+      conditions:
+        - condition: state
+          entity_id: input_text.vacuum_rooms
+          state: ''
     action:
       - service: rest_command.vacuum_clean
         data_template:
