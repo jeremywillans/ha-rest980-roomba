@@ -1,0 +1,250 @@
+### VERTICAL STACK CARD ###
+type: vertical-stack
+cards:
+  - entity: sensor.mop
+    type: custom:roomba-vacuum-card
+    mode: mop
+  - type: entities
+    entities:
+      - entities:
+          - entity: input_boolean.mop_schedule_1
+            name: Master Ensuite Clean (11am M/W/F)
+          - entity: input_boolean.mop_schedule_2
+            name: Apartment Clean (12pm Sun)
+        head:
+          label: Cleaning Schedules
+          type: section
+        type: custom:fold-entity-row
+      - entities:
+          - type: custom:select-list-card
+            entity: input_select.mop_maps
+        head:
+          label: Map Selection
+          type: section
+        type: custom:fold-entity-row
+      - default:
+          type: custom:blank-card
+        entity: input_select.mop_maps
+        states:
+          Kitchen:
+            entities:
+              - input_boolean.mop_clean_kitchen
+              - entity: automation.mop_clean_rooms
+                lock:
+                  enabled: >-
+                    [[[
+
+                    if ((states['group.mop_rooms'].state == "on") &&
+                    (states['sensor.mop'].state == "Ready"))
+                        return false;
+                    return true;
+
+                    ]]]
+                  exemptions: []
+                name: Clean Rooms
+                styles:
+                  card:
+                    - height: 50px
+                tap_action:
+                  action: call-service
+                  service: automation.trigger
+                  service_data:
+                    entity_id: automation.mop_clean_rooms
+                type: custom:button-card
+            head:
+              label: Kitchen Selective Room Cleaning
+              type: section
+            type: custom:fold-entity-row
+          Entry:
+            entities:
+              - input_boolean.mop_clean_entry
+              - entity: automation.mop_clean_rooms
+                lock:
+                  enabled: >-
+                    [[[
+
+                    if ((states['group.mop_rooms'].state == "on") &&
+                    (states['sensor.mop'].state == "Ready"))
+                        return false;
+                    return true;
+
+                    ]]]
+                  exemptions: []
+                name: Clean Rooms
+                styles:
+                  card:
+                    - height: 50px
+                tap_action:
+                  action: call-service
+                  service: automation.trigger
+                  service_data:
+                    entity_id: automation.mop_clean_rooms
+                type: custom:button-card
+            head:
+              label: Entry Selective Room Cleaning
+              type: section
+            type: custom:fold-entity-row
+          Bathroom:
+            entities:
+              - input_boolean.mop_clean_bathroom
+              - entity: automation.mop_clean_rooms
+                lock:
+                  enabled: >-
+                    [[[
+
+                    if ((states['group.mop_rooms'].state == "on") &&
+                    (states['sensor.mop'].state == "Ready"))
+                        return false;
+                    return true;
+
+                    ]]]
+                  exemptions: []
+                name: Clean Rooms
+                styles:
+                  card:
+                    - height: 50px
+                tap_action:
+                  action: call-service
+                  service: automation.trigger
+                  service_data:
+                    entity_id: automation.mop_clean_rooms
+                type: custom:button-card
+            head:
+              label: Bathroom Selective Room Cleaning
+              type: section
+            type: custom:fold-entity-row
+          Master Ensuite:
+            entities:
+              - input_boolean.mop_clean_master_ensuite
+              - entity: automation.mop_clean_rooms
+                lock:
+                  enabled: >-
+                    [[[
+
+                    if ((states['group.mop_rooms'].state == "on") &&
+                    (states['sensor.mop'].state == "Ready"))
+                        return false;
+                    return true;
+
+                    ]]]
+                  exemptions: []
+                name: Clean Rooms
+                styles:
+                  card:
+                    - height: 50px
+                tap_action:
+                  action: call-service
+                  service: automation.trigger
+                  service_data:
+                    entity_id: automation.mop_clean_rooms
+                type: custom:button-card
+            head:
+              label: Ensuite Selective Room Cleaning
+              type: section
+            type: custom:fold-entity-row
+        type: custom:state-switch
+      - entities:
+          - style: |-
+              .text-divider {
+                padding: 0em;
+                margin: 0em;
+              } h2 {
+                font-size: 1em;
+                margin-block-start: 0em;
+                margin-block-end: 0em;
+              }
+            text: Clean
+            type: custom:text-divider-row
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.mop_maint_clean_pad
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 days
+              - color: '#bf4060'
+                value: '-1 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 10 days
+            title: Mop Pad
+            type: custom:check-button-card
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.mop_maint_clean_contacts
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 days
+              - color: '#bf4060'
+                value: '-3 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 18 days
+            title: Contacts
+            type: custom:check-button-card
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.mop_maint_clean_wheels
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 days
+              - color: '#bf4060'
+                value: '-3 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 18 days
+            title: Wheels
+            type: custom:check-button-card
+          - style: |-
+              .text-divider {
+                padding: 0em;
+                margin: 0em;
+              } h2 {
+                font-size: 1em;
+                margin-block-start: 0em;
+                margin-block-end: 0em;
+              }
+            text: Replace
+            type: custom:text-divider-row
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.mop_maint_replace_pad
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 months
+              - color: '#bf4060'
+                value: '-4 months'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 8 months
+            title: Mop Pad
+            type: custom:check-button-card
+        head:
+          label: Maintenance
+          type: section
+        type: custom:fold-entity-row
+
+### PICTURE GLANCE CARD ###
+aspect_ratio: 0%
+camera_image: camera.roomba
+entities: []
+type: picture-glance

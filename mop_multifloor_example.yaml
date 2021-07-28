@@ -1,0 +1,109 @@
+###################################
+# iRobot Mop Package - Multi Floor
+###################################
+
+###################################
+# Input Select
+###################################
+
+input_select:
+  mop_maps:
+    name: Mop Maps
+    initial: Kitchen
+    options:
+      - Kitchen
+      - Entry
+      - Bathroom
+      - Master Ensuite
+
+###################################
+# Input Text
+###################################
+
+input_text:
+  mop_map_kitchen:
+    name: Mop Map URL Kitchen
+    initial: !secret mop_map_kitchen
+  mop_map_entry:
+    name: Mop Map URL Entry
+    initial: !secret mop_map_entry
+  mop_map_bathroom:
+    name: Mop Map URL Bathroom
+    initial: !secret mop_map_bathroom
+  mop_map_ensuite:
+    name: Mop Map URL Ensuite
+    initial: !secret mop_map_ensuite
+
+###################################
+# Automation
+###################################
+
+automation:
+  # Map Selection on Change and Startup
+  - alias: Mop Map Selection
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: input_select.mop_maps
+      - platform: homeassistant
+        event: start
+    action:
+      # Turn off all Mop Rooms
+      - service: input_boolean.turn_off
+        data:
+          entity_id: group.mop_rooms
+      # Reset Ordered Mop Rooms List
+      - service: input_text.set_value
+        data:
+          entity_id: input_text.mop_rooms
+          value: ''
+      # Set Correct PMap based on Room
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.mop_pmap_id
+          value: >-
+            {% if states('input_select.mop_maps') == 'Kitchen' %}
+              {{ state_attr('sensor.mop', 'pmap3_id') }}
+            {% elif states('input_select.mop_maps') == 'Entry' %}
+              {{ state_attr('sensor.mop', 'pmap2_id') }}
+            {% elif states('input_select.mop_maps') == 'Bathroom' %}
+              {{ state_attr('sensor.mop', 'pmap1_id') }}
+            {% elif states('input_select.mop_maps') == 'Master Ensuite' %}
+              {{ state_attr('sensor.mop', 'pmap0_id') }}
+            {% endif %}
+      # Set Correct Map URL for Shell Commands and Camera
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.mop_map
+          value: >-
+            {% if states('input_select.mop_maps') == 'Kitchen' %}
+              {{ states('input_text.mop_map_kitchen') }}
+            {% elif states('input_select.mop_maps') == 'Entry' %}
+              {{ states('input_text.mop_map_entry') }}
+            {% elif states('input_select.mop_maps') == 'Bathroom' %}
+              {{ states('input_text.mop_map_bathroom') }}
+            {% elif states('input_select.mop_maps') == 'Master Ensuite' %}
+              {{ states('input_text.mop_map_ensuite') }}
+            {% endif %}
+
+###################################
+# Camera
+###################################
+
+camera:
+  - platform: generic
+    still_image_url: !secret mop_map_kitchen
+    content_type: image/png
+    name: Braava Kitchen
+  - platform: generic
+    still_image_url: !secret mop_map_entry
+    content_type: image/png
+    name: Braava Entry
+  - platform: generic
+    still_image_url: !secret mop_map_bathroom
+    content_type: image/png
+    name: Braava Bathroom
+  - platform: generic
+    still_image_url: !secret mop_map_ensuite
+    content_type: image/png
+    name: Braava Ensuite
