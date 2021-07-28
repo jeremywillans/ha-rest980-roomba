@@ -1,158 +1,226 @@
 ### VERTICAL STACK CARD ###
+type: vertical-stack
 cards:
   - entity: sensor.vacuum
-    type: 'custom:roomba-vacuum-card'
-  - entities:
-      - input_boolean.vacuum_clean_kitchen
-      - input_boolean.vacuum_clean_entry
-      - input_boolean.vacuum_clean_hall
-      - input_boolean.vacuum_clean_living_room
-      - input_boolean.vacuum_clean_bathroom
-      - input_boolean.vacuum_clean_bedroom
-      - input_boolean.vacuum_clean_wardrobe
-      - input_boolean.vacuum_clean_master_ensuite
-      - input_boolean.vacuum_clean_master_bedroom
-      - input_boolean.vacuum_clean_table
-      - input_boolean.vacuum_clean_zone_fridge
-      - entity: automation.vacuum_clean_rooms
-        lock:
-          enabled: |
-            [[[
-              if ((states['group.vacuum_rooms'].state == "on") && (states['sensor.vacuum'].state == "Ready"))
-                return false;
-              return true;
-            ]]]
-          exemptions: []
-        name: Clean Rooms
-        styles:
-          card:
-            - height: 50px
-        tap_action:
-          action: call-service
-          service: automation.trigger
-          service_data:
-            entity_id: automation.vacuum_clean_rooms
-        type: 'custom:button-card'
-    head:
-      label: Selective Room Cleaning
-      type: section
-    type: 'custom:fold-entity-row'
-  - entities:
-      - style: |-
-          .text-divider {
-            padding: 0em;
-            margin: 0em;
-          } h2 {
-            font-size: 1em;
-            margin-block-start: 0em;
-            margin-block-end: 0em;
-          }
-        text: Clean
-        type: 'custom:text-divider-row'
-      - color: '#40bf6a'
-        due: true
-        entity: sensor.vacuum_maint_clean_brushes
-        severity:
-          - color: '#bfb540'
-            value: 0 days
-          - color: '#bf4060'
-            value: '-1 days'
-        timeout: 10 days
-        title: Brushes
-        type: 'custom:check-button-card'
-      - color: '#40bf6a'
-        due: true
-        entity: sensor.vacuum_maint_clean_contacts
-        severity:
-          - color: '#bfb540'
-            value: 0 days
-          - color: '#bf4060'
-            value: '-3 days'
-        timeout: 18 days
-        title: Contacts
-        type: 'custom:check-button-card'
-      - color: '#40bf6a'
-        due: true
-        entity: sensor.vacuum_maint_clean_filter
-        severity:
-          - color: '#bfb540'
-            value: 0 days
-          - color: '#bf4060'
-            value: '-10 days'
-        timeout: 10 days
-        title: Filter
-        type: 'custom:check-button-card'
-      - color: '#40bf6a'
-        due: true
-        entity: sensor.vacuum_maint_clean_wheel
-        severity:
-          - color: '#bfb540'
-            value: 0 days
-          - color: '#bf4060'
-            value: '-3 days'
-        timeout: 18 days
-        title: Wheel
-        type: 'custom:check-button-card'
-      - color: '#40bf6a'
-        due: true
-        entity: sensor.vacuum_maint_clean_bin
-        severity:
-          - color: '#bfb540'
-            value: 0 days
-          - color: '#bf4060'
-            value: '-3 days'
-        timeout: 18 days
-        title: Bin
-        type: 'custom:check-button-card'
-      - style: |-
-          .text-divider {
-            padding: 0em;
-            margin: 0em;
-          } h2 {
-            font-size: 1em;
-            margin-block-start: 0em;
-            margin-block-end: 0em;
-          }
-        text: Replace
-        type: 'custom:text-divider-row'
-      - color: '#40bf6a'
-        due: true
-        entity: sensor.vacuum_maint_replace_brushes
-        severity:
-          - color: '#bfb540'
-            value: 0 months
-          - color: '#bf4060'
-            value: '-4 months'
-        timeout: 8 months
-        title: Brushes
-        type: 'custom:check-button-card'
-      - color: '#40bf6a'
-        due: true
-        entity: sensor.vacuum_maint_replace_filter
-        severity:
-          - color: '#bfb540'
-            value: 0 months
-          - color: '#bf4060'
-            value: '-1 months'
-        timeout: 3 months
-        title: Filter
-        type: 'custom:check-button-card'
-      - color: '#40bf6a'
-        due: true
-        entity: sensor.vacuum_maint_replace_wheel
-        severity:
-          - color: '#bfb540'
-            value: 0 months
-          - color: '#bf4060'
-            value: '-4 months'
-        timeout: 2 years
-        title: Wheel
-        type: 'custom:check-button-card'
-    head:
-      label: Maintenance
-      type: section
-    type: 'custom:fold-entity-row'
-type: vertical-stack
+    type: custom:roomba-vacuum-card
+  - type: entities
+    entities:
+      - entities:
+          - entity: input_boolean.vacuum_schedule_1
+            name: Kitchen Clean (6am Daily)
+          - entity: input_boolean.vacuum_schedule_2
+            name: Apartment Clean (10am M/W/F)
+        head:
+          label: Cleaning Schedules
+          type: section
+        type: custom:fold-entity-row
+      - entities:
+          - input_boolean.vacuum_clean_kitchen
+          - input_boolean.vacuum_clean_entry
+          - input_boolean.vacuum_clean_hall
+          - input_boolean.vacuum_clean_living_room
+          - input_boolean.vacuum_clean_bathroom
+          - input_boolean.vacuum_clean_bedroom
+          - input_boolean.vacuum_clean_wardrobe
+          - input_boolean.vacuum_clean_master_ensuite
+          - input_boolean.vacuum_clean_master_passage
+          - input_boolean.vacuum_clean_master_bedroom
+          - input_boolean.vacuum_clean_table
+          - input_boolean.vacuum_clean_zone_fridge
+          - entity: automation.vacuum_clean_rooms
+            lock:
+              enabled: |-
+                [[[
+                  if ((states['group.vacuum_rooms'].state == "on") && (states['sensor.vacuum'].state == "Ready"))
+                    return false;
+                  return true;
+                ]]]
+              exemptions: []
+            name: Clean Rooms
+            styles:
+              card:
+                - height: 50px
+            tap_action:
+              action: call-service
+              service: automation.trigger
+              service_data:
+                entity_id: automation.vacuum_clean_rooms
+            type: custom:button-card
+        head:
+          label: Selective Room Cleaning
+          type: section
+        type: custom:fold-entity-row
+      - entities:
+          - style: |-
+              .text-divider {
+                padding: 0em;
+                margin: 0em;
+              } h2 {
+                font-size: 1em;
+                margin-block-start: 0em;
+                margin-block-end: 0em;
+              }
+            text: Clean
+            type: custom:text-divider-row
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum_maint_clean_brushes
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 days
+              - color: '#bf4060'
+                value: '-1 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 10 days
+            title: Brushes
+            type: custom:check-button-card
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum_maint_clean_contacts
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 days
+              - color: '#bf4060'
+                value: '-3 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 18 days
+            title: Contacts
+            type: custom:check-button-card
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum_maint_clean_filter
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 days
+              - color: '#bf4060'
+                value: '-10 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 10 days
+            title: Filter
+            type: custom:check-button-card
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum_maint_clean_wheel
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 days
+              - color: '#bf4060'
+                value: '-3 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 18 days
+            title: Wheel
+            type: custom:check-button-card
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum_maint_clean_bin
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 1 day
+              - color: '#bf4060'
+                value: '-2 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 3 weeks
+            title: Bin
+            type: custom:check-button-card
+          - style: |-
+              .text-divider {
+                padding: 0em;
+                margin: 0em;
+              } h2 {
+                font-size: 1em;
+                margin-block-start: 0em;
+                margin-block-end: 0em;
+              }
+            text: Replace
+            type: custom:text-divider-row
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum_maint_replace_brushes
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 months
+              - color: '#bf4060'
+                value: '-4 months'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 8 months
+            title: Brushes
+            type: custom:check-button-card
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum_maint_replace_filter
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 months
+              - color: '#bf4060'
+                value: '-1 months'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 3 months
+            title: Filter
+            type: custom:check-button-card
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum_maint_replace_wheel
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 months
+              - color: '#bf4060'
+                value: '-4 months'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 2 years
+            title: Wheel
+            type: custom:check-button-card
+        head:
+          label: Maintenance
+          type: section
+        type: custom:fold-entity-row
 
 ### PICTURE GLANCE CARD ###
 aspect_ratio: 0%
