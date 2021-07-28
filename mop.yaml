@@ -382,6 +382,8 @@ automation:
                 {%- endfor %}
               ]
             }
+          # Replace pmap_id line above with the following, if not using multi-floors
+          # "pmap_id": "{{ state_attr('sensor.mop', 'pmap0_id') | string }}",
       - service: input_text.set_value
         data:
           entity_id: input_text.mop_rooms
