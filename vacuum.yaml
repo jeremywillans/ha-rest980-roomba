@@ -21,6 +21,10 @@ sensor:
       - bbrun
       - name
       - pmaps
+      - vacHigh
+      - openOnly
+      - twoPass
+      - noAutoPasses
       - softwareVer
     resource: !secret vacuum_state
     value_template: 'OK'
@@ -221,11 +225,11 @@ sensor:
             {% else %}
               n-a
             {% endif %}
-          clean_passes: >-
-            {% if state_attr('sensor.rest980', 'noAutoPasses') is defined %}
-              {% if state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'false' %}
+          clean_mode: >-
+            {% if state_attr('sensor.rest980', 'noAutoPasses') is defined and state_attr('sensor.rest980', 'twoPass') is defined %}
+              {% if state_attr('sensor.rest980', 'noAutoPasses') == true and state_attr('sensor.rest980', 'twoPass') == false %}
                 One
-              {% elif state_attr('sensor.rest980', 'noAutoPasses') == 'true' and state_attr('sensor.rest980', 'twoPass') == 'true' %}
+              {% elif state_attr('sensor.rest980', 'noAutoPasses') == true and state_attr('sensor.rest980', 'twoPass') == true %}
                 Two
               {% else %}
                 Auto
@@ -235,9 +239,9 @@ sensor:
             {% endif %}
           carpet_boost: >-
             {% if state_attr('sensor.rest980', 'vacHigh') is defined %}
-              {% if state_attr('sensor.rest980', 'vacHigh') == 'false' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
+              {% if state_attr('sensor.rest980', 'vacHigh') == false and state_attr('sensor.rest980', 'carpetBoost') == false %}
                 Eco
-              {% elif state_attr('sensor.rest980', 'vacHigh') == 'true' and state_attr('sensor.rest980', 'carpetBoost') == 'false' %}
+              {% elif state_attr('sensor.rest980', 'vacHigh') == true and state_attr('sensor.rest980', 'carpetBoost') == false %}
                 Performance
               {% else %}
                 Auto
@@ -247,7 +251,7 @@ sensor:
             {% endif %}
           clean_edges: >-
             {% if state_attr('sensor.rest980', 'openOnly') is defined %}
-              {% if state_attr('sensor.rest980', 'openOnly') == 'true' %}
+              {% if state_attr('sensor.rest980', 'openOnly') == true %}
                 False
               {% else %}
                 True
@@ -302,6 +306,9 @@ input_boolean:
   vacuum_clean_kitchen:
     name: Kitchen
     icon: mdi:silverware-fork-knife
+  vacuum_clean_zone_fridge:
+    name: Fridge Zone
+    icon: mdi:fridge
   vacuum_clean_entry:
     name: Entry
     icon: mdi:coat-rack
@@ -326,12 +333,12 @@ input_boolean:
   vacuum_clean_master_bedroom:
     name: Master Bedroom
     icon: mdi:bed-empty
+  vacuum_clean_master_passage:
+    name: Master Passage
+    icon: mdi:ceiling-light
   vacuum_clean_table:
     name: Table
     icon: mdi:room-service
-  vacuum_clean_zone_fridge:
-    name: Fridge Zone
-    icon: mdi:fridge
   vacuum_maint_due:
     name: Vacuum Maintenance
     icon: mdi:wrench
@@ -366,6 +373,9 @@ input_text:
   vacuum_clean_kitchen:
     name: Kitchen
     initial: !secret vacuum_kitchen
+  vacuum_clean_zone_fridge:
+    name: Fridge Zone
+    initial: !secret vacuum_cz_fridge
   vacuum_clean_entry:
     name: Entry
     initial: !secret vacuum_entry
@@ -390,12 +400,12 @@ input_text:
   vacuum_clean_master_bedroom:
     name: Master Bedroom
     initial: !secret vacuum_master_bedroom
+  vacuum_clean_master_passage:
+      name: Master Passage
+      initial: !secret vacuum_master_passage
   vacuum_clean_table:
     name: Table
     initial: !secret vacuum_table
-  vacuum_clean_zone_fridge:
-    name: Fridge Zone
-    initial: !secret vacuum_clean_zone_fridge
 
 ###################################
 # Group
@@ -405,6 +415,7 @@ group:
   vacuum_rooms:
     entities:
       - input_boolean.vacuum_clean_kitchen
+      - input_boolean.vacuum_clean_zone_fridge
       - input_boolean.vacuum_clean_entry
       - input_boolean.vacuum_clean_hall
       - input_boolean.vacuum_clean_living_room
@@ -413,8 +424,8 @@ group:
       - input_boolean.vacuum_clean_wardrobe
       - input_boolean.vacuum_clean_master_ensuite
       - input_boolean.vacuum_clean_master_bedroom
+      - input_boolean.vacuum_clean_master_passage
       - input_boolean.vacuum_clean_table
-      - input_boolean.vacuum_clean_zone_fridge
 
 ###################################
 # Automation
@@ -606,7 +617,7 @@ automation:
             entity_id: camera.roomba
           # =============
 
-  # Maintence Check
+  # Maintenance Check
   - alias: Vacuum Maintenance Check
     initial_state: true
     trigger:
@@ -643,6 +654,7 @@ automation:
       platform: state
       entity_id: [
         'input_boolean.vacuum_clean_kitchen',
+        'input_boolean.vacuum_clean_zone_fridge',
         'input_boolean.vacuum_clean_entry',
         'input_boolean.vacuum_clean_hall',
         'input_boolean.vacuum_clean_living_room',
@@ -651,8 +663,8 @@ automation:
         'input_boolean.vacuum_clean_wardrobe',
         'input_boolean.vacuum_clean_master_ensuite',
         'input_boolean.vacuum_clean_master_bedroom',
-        'input_boolean.vacuum_clean_table',
-        'input_boolean.vacuum_clean_zone_fridge'
+        'input_boolean.vacuum_clean_master_passage',
+        'input_boolean.vacuum_clean_table'
       ]
       to: 'on'
     action:
@@ -675,6 +687,7 @@ automation:
       platform: state
       entity_id: [
         'input_boolean.vacuum_clean_kitchen',
+        'input_boolean.vacuum_clean_zone_fridge',
         'input_boolean.vacuum_clean_entry',
         'input_boolean.vacuum_clean_hall',
         'input_boolean.vacuum_clean_living_room',
@@ -683,8 +696,8 @@ automation:
         'input_boolean.vacuum_clean_wardrobe',
         'input_boolean.vacuum_clean_master_ensuite',
         'input_boolean.vacuum_clean_master_bedroom',
-        'input_boolean.vacuum_clean_table',
-        'input_boolean.vacuum_clean_zone_fridge'
+        'input_boolean.vacuum_clean_master_passage',
+        'input_boolean.vacuum_clean_table'
       ]
       to: 'off'
     action:
@@ -747,7 +760,7 @@ automation:
         entity_id: input_text.vacuum_rooms
         data_template: 
           entity_id: input_text.vacuum_rooms
-          value: "kitchen,entry,hall,living_room,bathroom,bedroom,wardrobe,master_ensuite,master_bedroom"
+          value: "kitchen,entry,hall,living_room,bathroom,bedroom,wardrobe,master_ensuite,master_passage"
       - service: automation.trigger
         entity_id: automation.vacuum_clean_rooms
 
@@ -775,7 +788,8 @@ notify:
 
 camera:
   - platform: generic
-    still_image_url: !secret vacuum_map
+    still_image_url: >-
+      {{ states('input_text.vacuum_map') }}
     content_type: image/png
     name: Roomba
 
