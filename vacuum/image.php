@@ -3,8 +3,10 @@
 //ini_set('display_errors', 1);
 
 // ADJUST THESE PARAMETERS
-$vacuum_log = 'http://<ip or fqdn of docker host>:<nginxphpport>/vacuum.log'; # Could also be HTTPS
-$set_first_coordinate = 0; # Ability to skip initial coordinate(s) if incorrect data logged
+$robot_log = 'http://<ip or fqdn of docker host>:<nginxphpport>/vacuum.log'; # Could also be HTTPS, or mop.log
+$file_append = ''; # Allows differentiation of files for different floors or robots
+$robot_type = 'robot'; # Select between roomba and braava for different icons
+$set_first_coordinate = 3; # Ability to skip initial coordinate(s) if incorrect data logged
 $overlay_image = 'floor.png'; # Background Layer
 $overlay_walls = false; # Allows overlaying of walls, used in fill mode to cover 'spray'
 $walls_image = 'walls.png'; # Walls Image must contain transparent floor
@@ -17,10 +19,10 @@ $y_offset = 220;
 $flip_vertical = false;
 $flip_horizontal = false;
 $render_status_text = true;
-$rotate_angle = 0; # Allows rotating of the roomba lines
+$rotate_angle = 0; # Allows rotating of the robot lines
 $x_scale=1.00; # Allows scaling of roomba x lines
 $y_scale=1.00; # Allows scaling of roomba y lines
-$ha_rest980 = 'https://<ip or fqdn of home assistant>:<haport>/api/states/sensor.rest980';
+$ha_rest980 = 'https://<ip or fqdn of home assistant>:<haport>/api/states/sensor.rest980'; # sensor.rest980_2, if configured for Mop
 $ha_token = '<ha_long_live_token>';
 $ha_timezone = 'Australia/Brisbane'; # Supported Timezones https://www.php.net/manual/en/timezones.php
 $ha_text_delimiter = " \n"; # How text is displayed on the map top " \n" --> New Line ## " |" --> Show on one line
@@ -42,22 +44,22 @@ $path_opacity = 0.5; # Opacity of Roomba path --> 0.0 = completely transparent, 
 ///////////////////////////////////////////////////////////////////
 
 if(isset($_GET['clear'])) {
-  @unlink("latest.png");
+  @unlink("latest".$file_append.".png");
   die();  
 }
-if(is_file("latest.png")&&!isset($_GET['last'])) {
+if(is_file("latest".$file_append.".png")&&!isset($_GET['last'])) {
   header("Content-Type: image/png");
-  echo file_get_contents("latest.png");
+  echo file_get_contents("latest".$file_append.".png");
   die();
 }
 
-$coords = file_get_contents($vacuum_log."?v=".time());
+$coords = file_get_contents($robot_log."?v=".time());
 $coords = str_replace("(", "", $coords);
 $coords = str_replace(")", "", $coords);
 $coords = explode("\n", $coords);
 
 if (count($coords) < 2) {
-  echo "No Coordinates found in file, is it reachable and populated? Log file - $vacuum_log?";
+  echo "No Coordinates found in file, is it reachable and populated? Log file - $robot_log?";
   die();
 }
 
@@ -96,9 +98,9 @@ imagesavealpha($image, true);
 $black = imagecolorallocatealpha($image,0,0,0, 127);
 imagefill($image,0,0,$black);
 
-$roomba = imagecreatefrompng('roomba.png');
-imagealphablending($roomba, false);
-imagesavealpha($roomba, true);
+$robot = imagecreatefrompng($robot_type.'.png');
+imagealphablending($robot, false);
+imagesavealpha($robot, true);
 
 foreach($coords as $i => $coord) {
   # Skip initial coordinates if needed
@@ -108,14 +110,14 @@ foreach($coords as $i => $coord) {
   $split = explode(",", $coord);
   if(sizeof($split)<2) {
     if(($coord == "Stuck") & ($show_stuck_positions)) {
-      $roomba_stuck = imagecreatefrompng('roomba_stuck.png');
-      imagealphablending($roomba_stuck, false);
-      imagesavealpha($roomba_stuck, true);
-      $roomba_stuck = imagerotate($roomba_stuck, $oldtheta*-1, imageColorAllocateAlpha($roomba_stuck, 0, 0, 0, 127));
-      imagealphablending($roomba_stuck, false);
-      imagesavealpha($roomba_stuck, true);
-      imagecopy($image, $roomba_stuck, $oldx-10, $oldy-5, 0, 0, imagesx($roomba_stuck), imagesy($roomba_stuck));
-      imagedestroy($roomba_stuck);
+      $robot_stuck = imagecreatefrompng($robot_type.'_stuck.png');
+      imagealphablending($robot_stuck, false);
+      imagesavealpha($robot_stuck, true);
+      $robot_stuck = imagerotate($robot_stuck, $oldtheta*-1, imageColorAllocateAlpha($robot_stuck, 0, 0, 0, 127));
+      imagealphablending($robot_stuck, false);
+      imagesavealpha($robot_stuck, true);
+      imagecopy($image, $robot_stuck, $oldx-10, $oldy-5, 0, 0, imagesx($robot_stuck), imagesy($robot_stuck));
+      imagedestroy($robot_stuck);
     }
     continue;
   }
@@ -149,10 +151,10 @@ foreach($coords as $i => $coord) {
   
   if($i+1==sizeof($coords)) {
     if (sizeof($split)>2) {
-      $roomba = imagerotate($roomba, $theta*-1, imageColorAllocateAlpha($roomba, 0, 0, 0, 127));
-      imagealphablending($roomba, false);
-      imagesavealpha($roomba, true);
-      imagecopy($image, $roomba, $x-10, $y-5, 0, 0, imagesx($roomba), imagesy($roomba));
+      $robot = imagerotate($robot, $theta*-1, imageColorAllocateAlpha($robot, 0, 0, 0, 127));
+      imagealphablending($robot, false);
+      imagesavealpha($robot, true);
+      imagecopy($image, $robot, $x-10, $y-5, 0, 0, imagesx($robot), imagesy($robot));
     }
   }
   
@@ -162,10 +164,10 @@ foreach($coords as $i => $coord) {
 }
 
 if(in_array($lastline, $end)) {
-  imagedestroy($roomba);
+  imagedestroy($robot);
   
   if($lastline == "Stuck") {
-    $overlayImage = imagecreatefrompng('roomba_stuck.png');
+    $overlayImage = imagecreatefrompng($robot_type.'_stuck.png');
     imagealphablending($overlayImage, false);
     imagesavealpha($overlayImage, true);
     $color = imagecolorallocate($image, 0, 149, 223);
@@ -174,7 +176,7 @@ if(in_array($lastline, $end)) {
     imagecopy($image, $finishedRoomba, $oldx-10, $oldy-5, 0, 0, imagesx($finishedRoomba), imagesy($finishedRoomba));
   }
   else if($lastline == "Finished") {
-    $overlayImage = imagecreatefrompng('roomba_charging.png');
+    $overlayImage = imagecreatefrompng($robot_type.'_charging.png');
     imagealphablending($overlayImage, false);
     imagesavealpha($overlayImage, true);
     $color = imagecolorallocate($image, 0, 149, 223);
@@ -253,11 +255,11 @@ if ($render_status_text) {
 header("Content-Type: image/png");
 imagepng($dest);
 if(isset($_GET['last'])) {
-  imagepng($dest, "latest.png");
-  imagepng($dest, $date.".png");
+  imagepng($dest, "latest".$file_append.".png");
+  imagepng($dest, $date.$file_append.".png");
 }
 imagedestroy($dest);
-imagedestroy($roomba);
-imagedestroy($roomba_stuck);
+imagedestroy($robot);
+imagedestroy($robot_stuck);
 imagedestroy($overlayImage);
 exit;
