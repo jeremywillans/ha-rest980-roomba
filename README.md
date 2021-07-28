@@ -15,9 +15,13 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 
 ## Setup Instructions
 
-The instructions included below don't specifcially ontain testing/confirmation per step. Please complete all the steps before perfomring any validation testing.
+The instructions included below don't specifically contain testing/confirmation per step. Please complete all the steps before performing any validation testing.
 
-### Step 1: Prerequesites
+NOTE: These instructions are written for the Roomba, but the same steps can be following for adding a Braava m6.
+
+I have included example multi-map configuration for the Braava (as this is how my setup works in my apartment given the Braava does not traverse carpet), please refer the FAQ for more info on my Multi-Floor setup.
+
+### Step 1: Prerequisites
 
 Before completing any of the below steps, you need to first configure your rooms/zones using the iRobot App!
 
@@ -28,6 +32,10 @@ The following custom components are used in this deployment - these can be insta
 - [lovelace-fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
 - [text-divider-row](https://github.com/custom-cards/text-divider-row/)
 - [button-card](https://github.com/custom-cards/button-card)
+
+If you plan to leverage multiple maps, the following additional components are used
+- [lovelace-state-switch](https://github.com/thomasloven/lovelace-state-switch)
+- [select-list-card](https://github.com/mattieha/select-list-card)
 
 A working MQTT Server with discovery is also needed (in conjunction with the check-button-card for Maintenance items) <https://www.home-assistant.io/integrations/sensor.mqtt/>
 
@@ -61,7 +69,7 @@ I have also included an example PHP Docker Image which i use to host the map.
 
 To allow this to work on Hass.io - I have created a custom github repository which can be added to Hass.io allowing the installation of the rest980 and nginx-php Docker Images (support arm and amd64 platforms)
 
-**Note:** Docker Hub only hosts a amd64 version of rest980, I have configured the HA Addon (formerley HASS) to build the image locally so it works on RPi (armv7). If you dont use HA and want to run rest980 on a non-arm64 platform, you will need to build the image manually.
+**Note:** Docker Hub only hosts a amd64 version of rest980, I have configured the HA Addon (formerly HASS) to build the image locally so it works on RPi (armv7). If you don't use HA and want to run rest980 on a non-arm64 platform, you will need to build the image manually.
 
 **DOCKER-COMPOSE**
 > [docker-compose.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/docker-compose.yaml)
@@ -93,7 +101,7 @@ http://<ip or fqdn of docker host>:<port>/api/local/info/state
 - Install and configure the php-nginx addon.
 - Start rest980 and php-nginx
 
-**Note** There are two copies of each addon listed, these allow you to run a second robot (or bravva), you do not need these if you only have 1 unit!
+**Note** There are two copies of each addon listed, these allow you to run a second robot (or braava), you do not need these if you only have 1 unit!
 
 **Alternative**: You can also run these locally by creating a rest980 (or similar) folder within "addons/local" and then copying the contents from each folder on my [hass-addons](https://github.com/jeremywillans/hass-addons/) repository. 
 
@@ -112,7 +120,7 @@ This will create a new local addon which you can install
 
 The below are my configuration YAML files which uses the [Packages](https://www.home-assistant.io/docs/configuration/packages/) feature in HA to keep all the separate components together.
 
-I split off the regions into the secrets file to make it easier to manage for future updates (these will change if you update your floorplan from the iRobot app)
+I split off the regions into the secrets file to make it easier to manage for future updates (these will change if you update your floor plan from the iRobot app)
 
 I have tried to map as many of the reported statuses, however I occasionally get an "Unknown" in the logs, if you work out another state, please post it up!
 
@@ -128,12 +136,18 @@ I have included notification options (with optional inclusion of the map for IOS
 You will **NEED** to update the following items to match the rooms you have used
 - Secret, Input Boolean and Input Text per room/zone
 - Group "Vacuum_Rooms"
-- Automation "Vacuum Add Rooms for Cleaning" Ttrigger entities
+- Automation "Vacuum Add Rooms for Cleaning" Trigger entities
 - Automation "Vacuum Remove Rooms for Cleaning" trigger entities
+
+I have also included a sample copy of the Braava m6 Configuration, and an additional file that has extra items for multi-floor. Refer FAQ for more details on multi-floor setups.
+
+> [mop.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/mop.yaml)
+> [mop_multifloor_example.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/mop_multifloor_example.yaml)
 
 ### Step 7: Configure Map Options
 
-You will need to update the variables at the top of the image.php to align with your environment.
+You will need separate map file for each robot and/or floor.
+For each map, please update the variables at the top of the image.php to align with your environment.
 
 Specifically the log, rest980, token and timezone ones should be done now - the rest are best to update once a full clean has run (to populate the map)
 
@@ -141,13 +155,19 @@ You can create the long-lived HA Token from your [HA Account Profile][profile] p
 
 ### Step 8: Configure Lovelace
 
-I have used the below lovelace configuration, ensure the relevant custom components are installed, as listed in the prerequesites section
+I have used the below lovelace configuration, ensure the relevant custom components are installed, as listed in the prerequisites section
 
-Note: This config is shown as the two cards used
+Note: This config is shown as the two cards uses
 - Vertical Stack
 - Picture Glance
 
 > [lovelace.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/lovelace.yaml)
+
+The following file provides an example setup for the Braava m6 configured for multiple floors, more info on this can be found in the FAQ Document.
+
+Note: This multi-floor card uses the custom add-ons `state-switch` and `select-list-card` as listed in the prerequisites.
+
+> [lovelace_mop_multifloor.yaml](https://github.com/jeremywillans/ha-rest980-roomba/blob/master/lovelace_mop_multifloor.yaml)
 
 You will **NEED** to update the following items to match the rooms you have used
 - Input Boolean per room/zone
@@ -165,7 +185,7 @@ You will also need to replace the included floor.png file with an floor plan or 
 **Note:** Once the vacuum has completed is clean, the image.php file references the latest.png file in the local vacuum directory so your changes wont be reflected upon refresh.
 Simply delete the "latest.png" file in the vacuum directory to force map regeneration each time (or run http://<ip or fqdn of docker host>:<nginxphpport>/image.phpclear=true```)
 
-### Step 10: Create Vacuum Maintenace Sensors
+### Step 10: Create Vacuum Maintenance Sensors
 
 You will need to create the Maintenance Sensors - simply expand the Maintenance dropdown in Lovelace and click the green check next to each item to create these. You might need to click on them **twice** to reset the time to zero.
 
@@ -189,7 +209,7 @@ If you have a different discovery prefix defined - such as "smartthings" - pleas
 
 ### Step 12: Update Recorder
 
-To prevent the database from storing unrequired data, the below privides an example of suggested exclusions you can add to your [recorder](https://www.home-assistant.io/integrations/recorder/#common-filtering-examples) component within your configuration.yaml file
+To prevent the database from storing unessential data, the below provides an example of suggested exclusions you can add to your [recorder](https://www.home-assistant.io/integrations/recorder/#common-filtering-examples) component within your configuration.yaml file
 
 ```
 recorder:
@@ -203,7 +223,7 @@ recorder:
       - camera.roomba
 ```
 
-### Step 11: Enjoy!
+### Step 13: Enjoy!
 
 ## Support
 
