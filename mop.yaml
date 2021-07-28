@@ -236,12 +236,16 @@ sensor:
             {% else %}
               False
             {% endif %}
+          # Floor Plan 0
           pmap0_id: >-
             {{ state_attr('sensor.rest980_2', 'pmaps')[0] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
+          # Floor Plan 1 (Optional, if relevant)
           pmap1_id: >-
             {{ state_attr('sensor.rest980_2', 'pmaps')[1] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
+          # Floor Plan 2 (Optional, if relevant)
           pmap2_id: >-
             {{ state_attr('sensor.rest980_2', 'pmaps')[2] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
+          # Floor Plan 3 (Optional, if relevant)
           pmap3_id: >-
             {{ state_attr('sensor.rest980_2', 'pmaps')[3] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
       mop_location:
