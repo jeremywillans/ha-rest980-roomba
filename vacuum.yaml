@@ -375,7 +375,7 @@ input_text:
     initial: !secret vacuum_kitchen
   vacuum_clean_zone_fridge:
     name: Fridge Zone
-    initial: !secret vacuum_cz_fridge
+    initial: !secret vacuum_clean_zone_fridge
   vacuum_clean_entry:
     name: Entry
     initial: !secret vacuum_entry
