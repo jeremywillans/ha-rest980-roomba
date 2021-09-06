@@ -26,7 +26,7 @@ I have included example multi-map configuration for the Braava (as this is how m
 Before completing any of the below steps, you need to first configure your rooms/zones using the iRobot App!
 
 The following custom components are used in this deployment - these can be installed from HACS
-- [roomba-vacuum-card] - Custom Plugin Repository
+- [roomba-vacuum-card]
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod)
 - [check-button-card](https://github.com/custom-cards/check-button-card)
 - [lovelace-fold-entity-row](https://github.com/thomasloven/lovelace-fold-entity-row)
