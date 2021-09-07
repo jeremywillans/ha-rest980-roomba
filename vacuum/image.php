@@ -5,7 +5,7 @@
 // ADJUST THESE PARAMETERS
 $robot_log = 'http://<ip or fqdn of docker host>:<nginxphpport>/vacuum.log'; # Could also be HTTPS, or mop.log
 $file_append = ''; # Allows differentiation of files for different floors or robots
-$robot_type = 'robot'; # Select between roomba and braava for different icons
+$robot_type = 'roomba'; # Select between roomba and braava for different icons
 $set_first_coordinate = 3; # Ability to skip initial coordinate(s) if incorrect data logged
 $overlay_image = 'floor.png'; # Background Layer
 $overlay_walls = false; # Allows overlaying of walls, used in fill mode to cover 'spray'
