@@ -73,8 +73,12 @@ sensor:
             {{ state_attr('sensor.rest980', 'batPct') }} %
           software_ver: >-
             {% if state_attr('sensor.rest980', 'softwareVer') is defined %}
-            {% set version = state_attr('sensor.rest980', 'softwareVer') %}
-              {{ version.split('+')[1] }} 
+              {% set version = state_attr('sensor.rest980', 'softwareVer') %}
+              {% if '+' in version %}
+                {{ version.split('+')[1] }} 
+              {% else %}
+                {{ version }} 
+              {% endif %}
             {% else %}
               n-a
             {% endif %}
