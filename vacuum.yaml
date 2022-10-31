@@ -26,6 +26,7 @@ sensor:
       - twoPass
       - noAutoPasses
       - softwareVer
+      - runtimeStats
     resource: !secret vacuum_state
     value_template: 'OK'
     scan_interval: 10
@@ -142,15 +143,15 @@ sensor:
               n-a
             {% endif %}
           total_area: >-
-            {% if state_attr('sensor.rest980', 'bbrun')['sqft'] is defined %}
-              {{ (state_attr('sensor.rest980', 'bbrun')['sqft'] / 10.764 * 100)| round() }}m²
+            {% if state_attr('sensor.rest980', 'runtimeStats')['sqft'] is defined %}
+              {{ (state_attr('sensor.rest980', 'runtimeStats')['sqft'] / 10.764 * 100)| round() }}m²
             {% else %}
               n-a
             {% endif %}
-          #   {{ (state_attr('sensor.rest980', 'bbrun')['sqft'] }}ft²
+          #   {{ (state_attr('sensor.rest980', 'runtimeStats')['sqft'] }}ft²
           total_time: >-
-            {% if state_attr('sensor.rest980', 'bbrun')['hr'] is defined %}
-              {{ state_attr('sensor.rest980', 'bbrun')['hr'] }}h {{ state_attr('sensor.rest980', 'bbrun')['min'] }}m
+            {% if state_attr('sensor.rest980', 'runtimeStats')['hr'] is defined %}
+              {{ state_attr('sensor.rest980', 'runtimeStats')['hr'] }}h {{ state_attr('sensor.rest980', 'runtimeStats')['min'] }}m
             {% else %}
               n-a
             {% endif %}
