@@ -129,12 +129,14 @@ sensor:
             {% endif %}
           tank: >-
             {% if state_attr('sensor.rest980_2', 'mopReady')['tankPresent'] is defined %}
-              {% if state_attr('sensor.rest980_2', 'mopReady')['tankPresent'] and state_attr('sensor.rest980_2', 'mopReady')['lidClosed'] %}
+              {% if state_attr('sensor.rest980_2', 'cleanMissionStatus')['notReady'] == 31 %}
+                Fill Tank
+              {% elif state_attr('sensor.rest980_2', 'mopReady')['tankPresent'] and state_attr('sensor.rest980_2', 'mopReady')['lidClosed'] %}
                 Ready
               {% elif state_attr('sensor.rest980_2', 'mopReady')['tankPresent'] and (state_attr('sensor.rest980_2', 'mopReady')['lidClosed'] == false) %}
                 Lid Open
               {% else %}
-                Fill Tank
+                Tank Missing
               {% endif %}
             {% else %}
               n-a
