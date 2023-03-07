@@ -25,9 +25,10 @@ sensor:
       - softwareVer
       - detectedPad
       - padWetness
-      - mopReady
       - rankOverlap
       - runtimeStats
+      - tankPresent
+      - lidOpen
     resource: !secret mop_state
     value_template: 'OK'
     scan_interval: 10
@@ -121,7 +122,8 @@ sensor:
                 'reusableDry' : 'Dry',
                 'reusableWet' : 'Wet',
                 'dispDry' : 'Single Dry',
-                'dispWet' : 'Single Wet'
+                'dispWet' : 'Single Wet',
+                'invalid' : 'No Pad'
                 } %}
               {% set state = state_attr('sensor.rest980_2', 'detectedPad') %}
               {{ mapper[state] if state in mapper else state}}
@@ -129,12 +131,12 @@ sensor:
               n-a
             {% endif %}
           tank: >-
-            {% if state_attr('sensor.rest980_2', 'mopReady')['tankPresent'] is defined %}
+            {% if state_attr('sensor.rest980_2', 'tankPresent') is defined %}
               {% if state_attr('sensor.rest980_2', 'cleanMissionStatus')['notReady'] == 31 %}
                 Fill Tank
-              {% elif state_attr('sensor.rest980_2', 'mopReady')['tankPresent'] and state_attr('sensor.rest980_2', 'mopReady')['lidClosed'] %}
+              {% elif state_attr('sensor.rest980_2', 'tankPresent') and state_attr('sensor.rest980_2', 'lidOpen') == false %}
                 Ready
-              {% elif state_attr('sensor.rest980_2', 'mopReady')['tankPresent'] and (state_attr('sensor.rest980_2', 'mopReady')['lidClosed'] == false) %}
+              {% elif state_attr('sensor.rest980_2', 'tankPresent') and (state_attr('sensor.rest980_2', 'lidOpen')) %}
                 Lid Open
               {% else %}
                 Tank Missing
