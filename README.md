@@ -9,7 +9,8 @@ This repository provides configuration to get an iRobot Roomba i7+ robot vacuum 
 ![Supports amd64 Architecture][amd64-shield]
 ![Supports armv7 Architecture][armv7-shield]
 
-## MAPPING STATUS :rotating_light: :rotating_light: :rotating_light:
+## MAPPING STATUS
+:rotating_light: :rotating_light: :rotating_light:
 Mapping data is no longer available in iRobot Firmware 3.20+
 See [Pinned Issue](https://github.com/jeremywillans/ha-rest980-roomba/issues/53)
 
