@@ -1,0 +1,1521 @@
+type: vertical-stack
+cards:
+  - entity: sensor.vacuum2
+    type: custom:roomba-vacuum-card
+  - type: entities
+    card_mod:
+      style: |
+        ha-card {
+          border-bottom: 0px;
+          border-bottom-left-radius:0px;
+          border-bottom-right-radius:0px;
+        }
+    entities:
+      - entities:
+          - entity: input_boolean.vacuum2_schedule_1
+            name: Kitchen Clean (6am Daily)
+          - entity: input_boolean.vacuum2_schedule_2
+            name: Apartment Clean (10am M/W/F)
+        head:
+          label: Cleaning Schedules
+          type: section
+        type: custom:fold-entity-row
+      - entities:
+          - style: |-
+              .text-divider {
+                padding: 0em;
+                margin: 0em;
+              } h2 {
+                font-size: 1em;
+                margin-block-start: 0em;
+                margin-block-end: 0em;
+              }
+            text: Clean
+            type: custom:text-divider-row
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum2_maint_clean_brushes
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 days
+              - color: '#bf4060'
+                value: '-1 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 10 days
+            title: Brushes
+            type: custom:check-button-card
+            discovery_prefix: homeassistant
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum2_maint_clean_contacts
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 days
+              - color: '#bf4060'
+                value: '-3 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 18 days
+            title: Contacts
+            type: custom:check-button-card
+            discovery_prefix: homeassistant
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum2_maint_clean_filter
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 days
+              - color: '#bf4060'
+                value: '-10 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 10 days
+            title: Filter
+            type: custom:check-button-card
+            discovery_prefix: homeassistant
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum2_maint_clean_wheel
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 days
+              - color: '#bf4060'
+                value: '-3 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 18 days
+            title: Wheel
+            type: custom:check-button-card
+            discovery_prefix: homeassistant
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum2_maint_clean_bin
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 1 day
+              - color: '#bf4060'
+                value: '-2 days'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 3 weeks
+            title: Bin
+            type: custom:check-button-card
+            discovery_prefix: homeassistant
+          - style: |-
+              .text-divider {
+                padding: 0em;
+                margin: 0em;
+              } h2 {
+                font-size: 1em;
+                margin-block-start: 0em;
+                margin-block-end: 0em;
+              }
+            text: Replace
+            type: custom:text-divider-row
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum2_maint_replace_brushes
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 months
+              - color: '#bf4060'
+                value: '-4 months'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 8 months
+            title: Brushes
+            type: custom:check-button-card
+            discovery_prefix: homeassistant
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum2_maint_replace_filter
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 months
+              - color: '#bf4060'
+                value: '-1 months'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 3 months
+            title: Filter
+            type: custom:check-button-card
+            discovery_prefix: homeassistant
+          - color: '#40bf6a'
+            due: true
+            entity: sensor.vacuum2_maint_replace_wheel
+            locale: en-au
+            severity:
+              - color: '#bfb540'
+                value: 0 months
+              - color: '#bf4060'
+                value: '-4 months'
+            style: |
+              ha-card {
+                padding: 2px;
+                --ha-card-box-shadow: 'none';
+                --paper-card-background-color: rgba(0, 0, 0, 0);
+              }
+            timeout: 2 years
+            title: Wheel
+            type: custom:check-button-card
+            discovery_prefix: homeassistant
+        head:
+          label: Maintenance
+          type: section
+        type: custom:fold-entity-row
+  - type: vertical-stack
+    cards:
+      - type: custom:button-card
+        entity: input_boolean.vacuum2_show_rooms
+        show_icon: true
+        name: Selective Room Cleaning
+        show_state: false
+        state:
+          - value: 'off'
+            icon: mdi:chevron-down
+          - value: 'on'
+            icon: mdi:chevron-up
+        styles:
+          card:
+            - padding: 0px
+            - border-top-left-radius: 0px;
+            - border-top-right-radius: 0px;
+            - margin-top: '-10px;'
+          name:
+            - padding-left: 24px
+            - font-size: 14px;
+            - font-weight: 500;
+            - justify-self: left;
+          icon:
+            - padding-top: 0px;
+            - margin-bottom: 24px;
+            - width: 32px
+            - margin-left: 0px
+            - margin-right: 16px
+            - color: white;
+          grid:
+            - grid-template-areas: '"n i"'
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_boolean.vacuum2_show_rooms
+            state: 'on'
+        card:
+          type: vertical-stack
+          card_mod:
+            style: |
+              div $:
+                hui-horizontal-stack
+          cards:
+            - type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  entity: input_boolean.vacuum2_clean_kitchen
+                  name: Kitchen
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - value: 'on'
+                      color: green
+                  color_type: card
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_kitchen_settings
+                  name: 2-Pass
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_kitchen_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return (parseInt(entity.state) - 2)
+                          else if (states['input_boolean.vacuum2_clean_kitchen'].state == 'on')
+                            return (parseInt(entity.state) + 2)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_kitchen_settings
+                  name: Mop
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 4) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_kitchen_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if ((entity.state & 8) && (entity.state & 4))
+                            return (parseInt(entity.state) - 12)
+                          else if (((entity.state) & 4) && (entity.state > 0))
+                            return (parseInt(entity.state) - 4)
+                          else if (states['input_boolean.vacuum2_clean_kitchen'].state == 'on')
+                            return (parseInt(entity.state) + 4)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_kitchen_settings
+                  name: Scrub
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_kitchen_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0) && (entity.state & 4))
+                            return (parseInt(entity.state) - 8)
+                          else if ((entity.state & 4) && (states['input_boolean.vacuum2_clean_kitchen'].state == 'on'))
+                            return (parseInt(entity.state) + 8)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_kitchen_settings
+                  name: VacHigh
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_kitchen_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return (parseInt(entity.state) - 16)
+                          else if (states['input_boolean.vacuum2_clean_kitchen'].state == 'on')
+                            return (parseInt(entity.state) + 16)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+            - type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  entity: input_boolean.vacuum2_clean_entry
+                  name: Entry
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - value: 'on'
+                      color: green
+                  color_type: card
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_entry_settings
+                  name: 2-Pass
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_entry_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return (parseInt(entity.state) - 2)
+                          else if (states['input_boolean.vacuum2_clean_entry'].state == 'on')
+                            return (parseInt(entity.state) + 2)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_entry_settings
+                  name: Mop
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 4) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_entry_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if ((entity.state & 8) && (entity.state & 4))
+                            return (parseInt(entity.state) - 12)
+                          else if (((entity.state) & 4) && (entity.state > 0))
+                            return (parseInt(entity.state) - 4)
+                          else if (states['input_boolean.vacuum2_clean_entry'].state == 'on')
+                            return (parseInt(entity.state) + 4)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_entry_settings
+                  name: Scrub
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_entry_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0) && (entity.state & 4))
+                            return (parseInt(entity.state) - 8)
+                          else if ((entity.state & 4) && (states['input_boolean.vacuum2_clean_entry'].state == 'on'))
+                            return (parseInt(entity.state) + 8)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_entry_settings
+                  name: VacHigh
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_entry_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return (parseInt(entity.state) - 16)
+                          else if (states['input_boolean.vacuum2_clean_entry'].state == 'on')
+                            return (parseInt(entity.state) + 16)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+            - type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  entity: input_boolean.vacuum2_clean_hall
+                  name: Hall
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - value: 'on'
+                      color: green
+                  color_type: card
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_hall_settings
+                  name: 2-Pass
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_hall_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return (parseInt(entity.state) - 2)
+                          else if (states['input_boolean.vacuum2_clean_hall'].state == 'on')
+                            return (parseInt(entity.state) + 2)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_hall_settings
+                  name: Mop
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 4) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_hall_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if ((entity.state & 8) && (entity.state & 4))
+                            return (parseInt(entity.state) - 12)
+                          else if (((entity.state) & 4) && (entity.state > 0))
+                            return (parseInt(entity.state) - 4)
+                          else if (states['input_boolean.vacuum2_clean_hall'].state == 'on')
+                            return (parseInt(entity.state) + 4)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_hall_settings
+                  name: Scrub
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_hall_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0) && (entity.state & 4))
+                            return (parseInt(entity.state) - 8)
+                          else if ((entity.state & 4) && (states['input_boolean.vacuum2_clean_hall'].state == 'on'))
+                            return (parseInt(entity.state) + 8)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_hall_settings
+                  name: VacHigh
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_hall_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return (parseInt(entity.state) - 16)
+                          else if (states['input_boolean.vacuum2_clean_hall'].state == 'on')
+                            return (parseInt(entity.state) + 16)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+            - type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  entity: input_boolean.vacuum2_clean_living_room
+                  name: Living Room
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - value: 'on'
+                      color: green
+                  color_type: card
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_living_room_settings
+                  name: 2-Pass
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_living_room_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return (parseInt(entity.state) - 2)
+                          else if (states['input_boolean.vacuum2_clean_living_room'].state == 'on')
+                            return (parseInt(entity.state) + 2)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_living_room_settings
+                  name: Mop
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 4) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_living_room_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if ((entity.state & 8) && (entity.state & 4))
+                            return (parseInt(entity.state) - 12)
+                          else if (((entity.state) & 4) && (entity.state > 0))
+                            return (parseInt(entity.state) - 4)
+                          else if (states['input_boolean.vacuum2_clean_living_room'].state == 'on')
+                            return (parseInt(entity.state) + 4)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_living_room_settings
+                  name: Scrub
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_living_room_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0) && (entity.state & 4))
+                            return (parseInt(entity.state) - 8)
+                          else if ((entity.state & 4) && (states['input_boolean.vacuum2_clean_living_room'].state == 'on'))
+                            return (parseInt(entity.state) + 8)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_living_room_settings
+                  name: VacHigh
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_living_room_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return (parseInt(entity.state) - 16)
+                          else if (states['input_boolean.vacuum2_clean_living_room'].state == 'on')
+                            return (parseInt(entity.state) + 16)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+            - type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  entity: input_boolean.vacuum2_clean_bathroom
+                  name: Guest Bath
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - value: 'on'
+                      color: green
+                  color_type: card
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_bathroom_settings
+                  name: 2-Pass
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_bathroom_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return (parseInt(entity.state) - 2)
+                          else if (states['input_boolean.vacuum2_clean_bathroom'].state == 'on')
+                            return (parseInt(entity.state) + 2)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_bathroom_settings
+                  name: Mop
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 4) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_bathroom_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if ((entity.state & 8) && (entity.state & 4))
+                            return (parseInt(entity.state) - 12)
+                          else if (((entity.state) & 4) && (entity.state > 0))
+                            return (parseInt(entity.state) - 4)
+                          else if (states['input_boolean.vacuum2_clean_bathroom'].state == 'on')
+                            return (parseInt(entity.state) + 4)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_bathroom_settings
+                  name: Scrub
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_bathroom_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0) && (entity.state & 4))
+                            return (parseInt(entity.state) - 8)
+                          else if ((entity.state & 4) && (states['input_boolean.vacuum2_clean_bathroom'].state == 'on'))
+                            return (parseInt(entity.state) + 8)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_bathroom_settings
+                  name: VacHigh
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_bathroom_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return (parseInt(entity.state) - 16)
+                          else if (states['input_boolean.vacuum2_clean_bathroom'].state == 'on')
+                            return (parseInt(entity.state) + 16)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+            - type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  entity: input_boolean.vacuum2_clean_master_ensuite
+                  name: Master Bath
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - value: 'on'
+                      color: green
+                  color_type: card
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_master_ensuite_settings
+                  name: 2-Pass
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_master_ensuite_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return (parseInt(entity.state) - 2)
+                          else if (states['input_boolean.vacuum2_clean_master_ensuite'].state == 'on')
+                            return (parseInt(entity.state) + 2)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_master_ensuite_settings
+                  name: Mop
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 4) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_master_ensuite_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if ((entity.state & 8) && (entity.state & 4))
+                            return (parseInt(entity.state) - 12)
+                          else if (((entity.state) & 4) && (entity.state > 0))
+                            return (parseInt(entity.state) - 4)
+                          else if (states['input_boolean.vacuum2_clean_master_ensuite'].state == 'on')
+                            return (parseInt(entity.state) + 4)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_master_ensuite_settings
+                  name: Scrub
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_master_ensuite_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0) && (entity.state & 4))
+                            return (parseInt(entity.state) - 8)
+                          else if ((entity.state & 4) && (states['input_boolean.vacuum2_clean_master_ensuite'].state == 'on'))
+                            return (parseInt(entity.state) + 8)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_master_ensuite_settings
+                  name: VacHigh
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_master_ensuite_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return (parseInt(entity.state) - 16)
+                          else if (states['input_boolean.vacuum2_clean_master_ensuite'].state == 'on')
+                            return (parseInt(entity.state) + 16)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+            - type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  entity: input_boolean.vacuum2_clean_master_bedroom
+                  name: Master Bed
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - value: 'on'
+                      color: green
+                  color_type: card
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_master_bedroom_settings
+                  name: 2-Pass
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_master_bedroom_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return (parseInt(entity.state) - 2)
+                          else if (states['input_boolean.vacuum2_clean_master_bedroom'].state == 'on')
+                            return (parseInt(entity.state) + 2)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_master_bedroom_settings
+                  name: Mop
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 4) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_master_bedroom_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if ((entity.state & 8) && (entity.state & 4))
+                            return (parseInt(entity.state) - 12)
+                          else if (((entity.state) & 4) && (entity.state > 0))
+                            return (parseInt(entity.state) - 4)
+                          else if (states['input_boolean.vacuum2_clean_master_bedroom'].state == 'on')
+                            return (parseInt(entity.state) + 4)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_master_bedroom_settings
+                  name: Scrub
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_master_bedroom_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0) && (entity.state & 4))
+                            return (parseInt(entity.state) - 8)
+                          else if ((entity.state & 4) && (states['input_boolean.vacuum2_clean_master_bedroom'].state == 'on'))
+                            return (parseInt(entity.state) + 8)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_master_bedroom_settings
+                  name: VacHigh
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_master_bedroom_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return (parseInt(entity.state) - 16)
+                          else if (states['input_boolean.vacuum2_clean_master_bedroom'].state == 'on')
+                            return (parseInt(entity.state) + 16)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+            - type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  entity: input_boolean.vacuum2_clean_office
+                  name: Office
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - value: 'on'
+                      color: green
+                  color_type: card
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_office_settings
+                  name: 2-Pass
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_office_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return (parseInt(entity.state) - 2)
+                          else if (states['input_boolean.vacuum2_clean_office'].state == 'on')
+                            return (parseInt(entity.state) + 2)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_office_settings
+                  name: Mop
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 4) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_office_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if ((entity.state & 8) && (entity.state & 4))
+                            return (parseInt(entity.state) - 12)
+                          else if (((entity.state) & 4) && (entity.state > 0))
+                            return (parseInt(entity.state) - 4)
+                          else if (states['input_boolean.vacuum2_clean_office'].state == 'on')
+                            return (parseInt(entity.state) + 4)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_office_settings
+                  name: Scrub
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_office_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0) && (entity.state & 4))
+                            return (parseInt(entity.state) - 8)
+                          else if ((entity.state & 4) && (states['input_boolean.vacuum2_clean_office'].state == 'on'))
+                            return (parseInt(entity.state) + 8)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_office_settings
+                  name: VacHigh
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_office_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return (parseInt(entity.state) - 16)
+                          else if (states['input_boolean.vacuum2_clean_office'].state == 'on')
+                            return (parseInt(entity.state) + 16)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+            - type: horizontal-stack
+              cards:
+                - type: custom:button-card
+                  entity: input_boolean.vacuum2_clean_breakfast_room
+                  name: Breakfast Room
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - value: 'on'
+                      color: green
+                  color_type: card
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_breakfast_room_settings
+                  name: 2-Pass
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_breakfast_room_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 2) && (entity.state > 0))
+                            return (parseInt(entity.state) - 2)
+                          else if (states['input_boolean.vacuum2_clean_breakfast_room'].state == 'on')
+                            return (parseInt(entity.state) + 2)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_breakfast_room_settings
+                  name: Mop
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 4) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_breakfast_room_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if ((entity.state & 8) && (entity.state & 4))
+                            return (parseInt(entity.state) - 12)
+                          else if (((entity.state) & 4) && (entity.state > 0))
+                            return (parseInt(entity.state) - 4)
+                          else if (states['input_boolean.vacuum2_clean_breakfast_room'].state == 'on')
+                            return (parseInt(entity.state) + 4)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_breakfast_room_settings
+                  name: Scrub
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_breakfast_room_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 8) && (entity.state > 0) && (entity.state & 4))
+                            return (parseInt(entity.state) - 8)
+                          else if ((entity.state & 4) && (states['input_boolean.vacuum2_clean_breakfast_room'].state == 'on'))
+                            return (parseInt(entity.state) + 8)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+                - type: custom:button-card
+                  entity: input_number.vacuum2_clean_breakfast_room_settings
+                  name: VacHigh
+                  show_icon: false
+                  show_state: false
+                  card_mod:
+                    class: vacuum_zone
+                  state:
+                    - operator: template
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return true
+                        ]]]
+                      color: green
+                  color_type: card
+                  tap_action:
+                    action: call-service
+                    target:
+                      entity_id: input_number.vacuum2_clean_breakfast_room_settings
+                    service: input_number.set_value
+                    service_data:
+                      value: |
+                        [[[
+                          if (((entity.state) & 16) && (entity.state > 0))
+                            return (parseInt(entity.state) - 16)
+                          else if (states['input_boolean.vacuum2_clean_breakfast_room'].state == 'on')
+                            return (parseInt(entity.state) + 16)
+                          else
+                            return (parseInt(entity.state))
+                        ]]]
+            - type: custom:button-card
+              entity: automation.vacuum2_clean_rooms
+              lock:
+                enabled: |-
+                  [[[
+                    if ((states['group.vacuum2_rooms'].state == "on") && (states['sensor.vacuum2'].state == "Ready"))
+                      return false;
+                    return true;
+                  ]]]
+                exemptions: []
+              name: Clean Rooms
+              styles:
+                card:
+                  - height: 50px
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                service_data:
+                  entity_id: automation.vacuum2_clean_rooms
+    card_mod:
+      style: |
+        button-card {
+          padding: 40px;
+          position-top: -10px;
+        }
