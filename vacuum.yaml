@@ -515,9 +515,11 @@ automation:
           entity_id: sensor.vacuum
           state: 'Train'
     action:
-      - service: notify.vacuumfile
-        data_template: 
-          message: "{{ states('sensor.vacuum_location') }}"
+        - target:
+           entity_id: notify.vacuumfile
+          data:
+            message: "{{ states('sensor.vacuum_location') }}"
+          action: notify.send_message
                
   # Initialize Blank Vacuum Log File
   - alias: Vacuum Clean Log
@@ -552,9 +554,12 @@ automation:
         from: 'Pending'
         to: 'Ready'
     action:
-      - service: notify.vacuumfile
-        data_template: 
+      action:
+        - target:
+          entity_id: notify.vacuumfile
+        data:
           message: "Finished"
+        action: notify.send_message
 
   # Update Vacuum Log File with Stuck Status
   - alias: Vacuum Notify on Stuck Status
@@ -563,9 +568,11 @@ automation:
       platform: template
       value_template: "{{ is_state_attr('sensor.vacuum', 'phase', 'Stuck') }}"
     action:
-      - service: notify.vacuumfile
-        data_template: 
+      - target:
+          entity_id: notify.vacuumfile
+        data:
           message: "Stuck"
+        action: notify.send_message
       # DELETE BELOW SECTION IF YOU DONT WANT NOTIFICATIONS
       - delay: 5
       - service: !secret vacuum_notify
