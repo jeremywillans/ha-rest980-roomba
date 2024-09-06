@@ -227,8 +227,14 @@ recorder:
       - sensor.rest980
       - camera.roomba
 ```
+### Step 13: Create Generic Camera Integration
 
-### Step 13: Enjoy!
+Create a new integration of 'Generic Camera' with the name 'Roomba' (or "Braava' if you are using mop.yaml). Set the 'Still Image URL' to the below and save the integration.
+```
+{{ states('input_text.vacuum_map') }}
+```
+
+### Step 14: Enjoy!
 
 ## Support
 

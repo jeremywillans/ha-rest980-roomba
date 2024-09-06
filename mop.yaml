@@ -699,17 +699,6 @@ notify:
       filename: !secret mop_log
 
 ###################################
-# Camera
-###################################
-
-camera:
-  - platform: generic
-    still_image_url: >-
-      {{ states('input_text.mop_map') }}
-    content_type: image/png
-    name: Braava
-
-###################################
 # Shell Command
 ###################################
 

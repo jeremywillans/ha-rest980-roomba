@@ -795,17 +795,6 @@ notify:
       filename: !secret vacuum_log
 
 ###################################
-# Camera
-###################################
-
-camera:
-  - platform: generic
-    still_image_url: >-
-      {{ states('input_text.vacuum_map') }}
-    content_type: image/png
-    name: Roomba
-
-###################################
 # Shell Command
 ###################################
 
