@@ -554,8 +554,7 @@ automation:
         from: 'Pending'
         to: 'Ready'
     action:
-      action:
-        - target:
+      - target:
           entity_id: notify.vacuumfile
         data:
           message: "Finished"
