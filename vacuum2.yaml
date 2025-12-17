@@ -1,0 +1,940 @@
+###################################
+# iRobot Vacuum Package
+###################################
+
+###################################
+# Sensor
+###################################
+
+sensor:
+  # Roomba via Rest980 Docker Image
+  - platform: rest
+    name: rest980_2
+    json_attributes:
+      - batPct
+      - bin
+      - carpetBoost
+      - cleanMissionStatus
+      - detectedPad
+      - dock
+      - padWetness
+      - pose
+      - signal
+      - bbmssn
+      - bbrun
+      - name
+      - pmaps
+      - tankPresent
+      - tankLvl
+      - twoPass
+      - vacHigh
+      - openOnly
+      - twoPass
+      - noAutoPasses
+      - softwareVer
+    resource: !secret vacuum2_state
+    value_template: "OK"
+    scan_interval: 10
+  - platform: template
+    sensors:
+      vacuum2:
+        friendly_name_template: >-
+          {{ state_attr('sensor.rest980_2', 'name') }}
+        value_template: >-
+          {% if state_attr('sensor.rest980_2', 'cleanMissionStatus')['cycle'] == 'none' and state_attr('sensor.rest980_2', 'cleanMissionStatus')['notReady'] == 39 %}
+            Pending
+          {% elif state_attr('sensor.rest980_2', 'cleanMissionStatus')['notReady'] > 0 %}
+            Not Ready
+          {% else %}
+          {% set mapper =  {
+            'clean' : 'Clean',
+            'quick' : 'Clean',
+            'spot' : 'Spot',
+            'evac' : 'Empty',
+            'dock' : 'Dock',
+            'train' : 'Train',
+            'none' : 'Ready' } %}
+          {% set state =  state_attr('sensor.rest980_2', 'cleanMissionStatus')['cycle'] %}
+          {{ mapper[state] if state in mapper else state }}
+          {% endif %}
+        icon_template: mdi:robot-vacuum
+        attribute_templates:
+          notready_msg: >-
+            {% set mapper =  {
+              0 : 'n-a',
+              2 : 'Uneven Ground',
+              15 : 'Low Battery',
+              39 : 'Pending',
+              48 : 'Path Blocked' } %}
+            {% set state =  state_attr('sensor.rest980_2', 'cleanMissionStatus')['notReady'] %}
+            {{ mapper[state] if state in mapper else state }}
+          error_msg: >-
+            {% set mapper =  {
+              0 : 'n-a',
+              15 : 'Reboot Required',
+              18 : 'Docking Issue'} %}
+            {% set state =  state_attr('sensor.rest980_2', 'cleanMissionStatus')['error'] %}
+            {{ mapper[state] if state in mapper else state }}
+          battery: >-
+            {{ state_attr('sensor.rest980_2', 'batPct') }} %
+          software_ver: >-
+            {% if state_attr('sensor.rest980_2', 'softwareVer') is defined %}
+              {% set version = state_attr('sensor.rest980_2', 'softwareVer') %}
+              {% if '+' in version %}
+                {{ version.split('+')[1] }} 
+              {% else %}
+                {{ version }} 
+              {% endif %}
+            {% else %}
+              n-a
+            {% endif %}
+          phase: >-
+            {% if state_attr('sensor.rest980_2', 'cleanMissionStatus')['phase'] == 'charge' and state_attr('sensor.rest980_2', 'batPct') == 100 %}
+              Idle
+            {% elif state_attr('sensor.rest980_2', 'cleanMissionStatus')['cycle'] == 'none' and state_attr('sensor.rest980_2', 'cleanMissionStatus')['phase'] == 'stop' %}
+              Stopped
+            {% else %}
+            {% set mapper =  {
+              'charge' : 'Charge',
+              'run' : 'Run',
+              'evac' : 'Empty',
+              'stop' : 'Paused',
+              'stuck' : 'Stuck',
+              'hmUsrDock' : 'Sent Home',
+              'hmMidMsn' : 'Mid Dock',
+              'hmPostMsn' : 'Final Dock' } %}
+            {% set state =  state_attr('sensor.rest980_2', 'cleanMissionStatus')['phase'] %}
+            {{ mapper[state] if state in mapper else state }}
+            {% endif %}
+          bin: >-
+            {% set mapper =  {
+              true : 'Full',
+              false : 'Not Full' } %}
+            {% set state =  state_attr('sensor.rest980_2', 'bin')['full'] %}
+            {{ mapper[state] if state in mapper else state }}
+          bin_present: >-
+            {% set mapper =  {
+              true : 'Yes',
+              false : 'No' } %}
+            {% set state =  state_attr('sensor.rest980_2', 'bin')['present'] %}
+            {{ mapper[state] if state in mapper else state }}
+          tank: >-
+            {% if state_attr('sensor.rest980_2', 'tankLvl') is defined %}
+              {{ state_attr('sensor.rest980_2', 'tankLvl')}}
+            {% else %}
+              n-a
+            {% endif %}
+          tank_present: >-
+            {% set mapper =  {
+              true : 'Yes',
+              false : 'No' } %}
+            {% set state =  state_attr('sensor.rest980_2', 'tankPresent') %}
+            {{ mapper[state] if state in mapper else state }}
+          clean_base: >-
+            {% if state_attr('sensor.rest980_2', 'dock')['state'] is defined %}
+              {% set mapper =  {
+                300 : 'Ready',
+                301 : 'Ready',
+                302 : 'Empty',
+                303 : 'Empty',
+                350 : 'Bag Missing',
+                351 : 'Clogged',
+                352 : 'Sealing Problem',
+                353 : 'Bag Full',
+                360 : 'Comms Problem',
+                363 : 'Charging Issue',
+                364 : 'Unknown - 364' } %}
+              {% set state =  state_attr('sensor.rest980_2', 'dock')['state'] %}
+              {{ mapper[state] if state in mapper else state }}
+            {% else %}
+              n-a
+            {% endif %}
+          base_tank: >-
+            {% if state_attr('sensor.rest980_2', 'dock')['tankLvl'] is defined %}
+              {{ state_attr('sensor.rest980_2', 'dock')['tankLvl']}}
+            {% else %}
+              n-a
+            {% endif %}
+          location: >-
+            {% if state_attr('sensor.rest980_2', 'pose')['theta'] is defined %}
+              ({{ state_attr('sensor.rest980_2', 'pose')['point']['x'] }}, {{ state_attr('sensor.rest980_2', 'pose')['point']['y'] }}, {{ state_attr('sensor.rest980_2', 'pose')['theta'] }})
+            {% else %}
+              n-a
+            {% endif %}
+          rssi: >-
+            {% if state_attr('sensor.rest980_2', 'signal')['rssi'] is defined %}
+              {{ state_attr('sensor.rest980_2', 'signal')['rssi'] }}
+            {% else %}
+              n-a
+            {% endif %}
+          total_area: >-
+            {% if state_attr('sensor.rest980_2', 'bbrun')['sqft'] is defined %}
+              {{ (state_attr('sensor.rest980_2', 'bbrun')['sqft'] / 10.764 * 100)| round() }}m²
+            {% else %}
+              n-a
+            {% endif %}
+          #   {{ (state_attr('sensor.rest980_2', 'bbrun')['sqft'] }}ft²
+          total_time: >-
+            {% if state_attr('sensor.rest980_2', 'bbrun')['hr'] is defined %}
+              {{ state_attr('sensor.rest980_2', 'bbrun')['hr'] }}h {{ state_attr('sensor.rest980_2', 'bbrun')['min'] }}m
+            {% else %}
+              n-a
+            {% endif %}
+          total_jobs: >-
+            {% if state_attr('sensor.rest980_2', 'bbmssn')['nMssn'] is defined %}
+              {{ state_attr('sensor.rest980_2', 'bbmssn')['nMssn'] }}
+            {% else %}
+              n-a
+            {% endif %}
+          dirt_events: >-
+            {% if state_attr('sensor.rest980_2', 'bbrun')['nScrubs'] is defined %}
+              {{ state_attr('sensor.rest980_2', 'bbrun')['nScrubs'] }}
+            {% else %}
+              n-a
+            {% endif %}
+          # evac_events I7+/S9+ Models (Clean Base)
+          evac_events: >-
+            {% if state_attr('sensor.rest980_2', 'bbrun')['nEvacs'] is defined %}
+              {{ state_attr('sensor.rest980_2', 'bbrun')['nEvacs'] }}  
+            {% else %}
+              n-a
+            {% endif %}
+          job_initiator: >-
+            {% set mapper =  {
+              'schedule' : 'Scheduler',
+              'rmtApp' : 'App',
+              'manual' : 'Robot',
+              'localApp' : 'HA' } %}
+            {% set state =  state_attr('sensor.rest980_2', 'cleanMissionStatus')['initiator'] %}
+            {{ mapper[state] if state in mapper else state }}
+          job_time: >-
+            {% if state_attr('sensor.rest980_2', 'cleanMissionStatus')['mssnStrtTm'] is defined %}
+              {% if state_attr('sensor.rest980_2', 'cleanMissionStatus')['mssnStrtTm'] != 0 %}
+                {% set time = state_attr('sensor.rest980_2', 'cleanMissionStatus')['mssnStrtTm'] | timestamp_local %}
+                {% set elapsed = ((as_timestamp(now()) - as_timestamp(time)) / 60) | round(0) %}
+                {% if elapsed > 60 %}
+                  {{ elapsed // 60 }}h {{ '{:0>2d}'.format(elapsed%60) }}m
+                {% else %}
+                  {{elapsed}}m
+                {% endif %}
+              {% else %}
+                n-a
+              {% endif %}
+            {% else %}
+              n-a
+            {% endif %}
+          job_recharge: >-
+            {% if state_attr('sensor.rest980_2', 'cleanMissionStatus')['rechrgTm'] is defined %}
+              {% if state_attr('sensor.rest980_2', 'cleanMissionStatus')['rechrgTm'] != 0 %}
+                {% set time = state_attr('sensor.rest980_2', 'cleanMissionStatus')['rechrgTm'] | timestamp_local %}
+                {% set resume = ((as_timestamp(time) - as_timestamp(now())) / 60) | round(0) %}
+                {% if resume > 60 %}
+                  {{ resume // 60 }}h {{ '{:0>2d}'.format(resume%60) }}m
+                {% else %}
+                  {{resume}}m
+                {% endif %}
+              {% else %}
+                n-a
+              {% endif %}
+            {% else %}
+              n-a
+            {% endif %}
+          job_expires: >-
+            {% if state_attr('sensor.rest980_2', 'cleanMissionStatus')['expireTm'] is defined %}
+              {% if state_attr('sensor.rest980_2', 'cleanMissionStatus')['expireTm'] != 0 %}
+                {% set time = state_attr('sensor.rest980_2', 'cleanMissionStatus')['expireTm'] | timestamp_local %}
+                {% set resume = ((as_timestamp(time) - as_timestamp(now())) / 60) | round(0) %}
+                {% if resume > 60 %}
+                  {{ resume // 60 }}h {{ '{:0>2d}'.format(resume%60) }}m
+                {% else %}
+                  {{resume}}m
+                {% endif %}
+              {% else %}
+                n-a
+              {% endif %}
+            {% else %}
+              n-a
+            {% endif %}
+          clean_mode: >-
+            {% if state_attr('sensor.rest980_2', 'noAutoPasses') is defined and state_attr('sensor.rest980_2', 'twoPass') is defined %}
+              {% if state_attr('sensor.rest980_2', 'noAutoPasses') == true and state_attr('sensor.rest980_2', 'twoPass') == false %}
+                One
+              {% elif state_attr('sensor.rest980_2', 'noAutoPasses') == true and state_attr('sensor.rest980_2', 'twoPass') == true %}
+                Two
+              {% else %}
+                Auto
+              {% endif %} 
+            {% else %}
+              n-a
+            {% endif %}
+          carpet_boost: >-
+            {% if state_attr('sensor.rest980_2', 'vacHigh') is defined %}
+              {% if state_attr('sensor.rest980_2', 'vacHigh') == false and state_attr('sensor.rest980_2', 'carpetBoost') == false %}
+                Eco
+              {% elif state_attr('sensor.rest980_2', 'vacHigh') == true and state_attr('sensor.rest980_2', 'carpetBoost') == false %}
+                Performance
+              {% else %}
+                Auto
+              {% endif %}
+            {% else %}
+              n-a
+            {% endif %}
+          clean_edges: >-
+            {% if state_attr('sensor.rest980_2', 'openOnly') is defined %}
+              {% if state_attr('sensor.rest980_2', 'openOnly') == true %}
+                False
+              {% else %}
+                True
+              {% endif %}
+            {% else %}
+              n-a
+            {% endif %}
+          maint_due: >-
+            {% if is_state('input_boolean.vacuum2_maint_due', 'on') %}
+              True
+            {% else %}
+              False
+            {% endif %}
+          # pmap0_id I7/S9 Models
+          pmap0_id: >-
+            {% if state_attr('sensor.rest980_2', 'pmaps')[0] is defined %}
+              {{ state_attr('sensor.rest980_2', 'pmaps')[0] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
+            {% else %}
+              n-a
+            {% endif %}
+      vacuum2_location:
+        friendly_name_template: >-
+          {{ state_attr('sensor.rest980_2', 'name') }} Location
+        value_template: >-
+          {{ state_attr('sensor.vacuum2', 'location') }}
+        icon_template: mdi:home-map-marker
+
+###################################
+# Rest Command
+###################################
+
+rest_command:
+  vacuum2_action:
+    url: >-
+      {{ states('input_text.vacuum2_action') }}{{ command }}
+    verify_ssl: !secret vacuum2_verify_ssl
+    method: "get"
+    timeout: 20
+  vacuum2_clean:
+    url: >-
+      {{ states('input_text.vacuum2_action') }}cleanRoom
+    verify_ssl: !secret vacuum2_verify_ssl
+    method: POST
+    content_type: "application/json"
+    payload: "{{ payload }}"
+
+###################################
+# Input Boolean
+###################################
+
+input_boolean:
+  vacuum2_clean_kitchen:
+    name: Kitchen
+    icon: mdi:silverware-fork-knife
+  vacuum2_clean_entry:
+    name: Entry
+    icon: mdi:coat-rack
+  vacuum2_clean_hall:
+    name: Hall
+    icon: mdi:ceiling-light
+  vacuum2_clean_living_room:
+    name: Living Room
+    icon: mdi:sofa
+  vacuum2_clean_office:
+    name: Office
+    icon: mdi:ceiling-light
+  vacuum2_clean_breakfast_room:
+    name: Breakfast Room
+    icon: mdi:sofa
+  vacuum2_clean_bathroom:
+    name: Guest Bathroom
+    icon: mdi:shower
+  vacuum2_clean_master_ensuite:
+    name: Master Bathroom
+    icon: mdi:shower
+  vacuum2_clean_master_bedroom:
+    name: Master Bedroom
+    icon: mdi:bed-empty
+  vacuum2_maint_due:
+    name: Vacuum Maintenance
+    icon: mdi:wrench
+  vacuum2_schedule_1:
+    name: Vacuum Schedule 1
+    icon: mdi:timetable
+  vacuum2_schedule_2:
+    name: Vacuum Schedule 2
+    icon: mdi:timetable
+  vacuum2_show_rooms:
+    name: Show Vacuum2 Rooms
+
+###################################
+# Input Text
+###################################
+
+input_text:
+  vacuum2_action:
+    name: Vacuum Action URL
+    initial: !secret vacuum2_action
+  vacuum2_map:
+    name: Vacuum Map URL
+    initial: !secret vacuum2_map
+  vacuum2_log:
+    name: Vacuum Log Path
+    initial: !secret vacuum2_log
+  vacuum2_dir:
+    name: Vacuum Dir Path
+    initial: !secret vacuum2_dir
+  vacuum2_rooms:
+    name: Cleani-Kun Rooms
+    max: 255
+  vacuum2_clean_kitchen:
+    name: Kitchen
+    initial: !secret vacuum2_kitchen
+  #  vacuum2_clean_zone_fridge:
+  #    name: Fridge Zone
+  #    initial: !secret vacuum2_clean_zone_fridge
+  vacuum2_clean_entry:
+    name: Entry
+    initial: !secret vacuum2_entry
+  vacuum2_clean_hall:
+    name: Hall
+    initial: !secret vacuum2_hall
+  vacuum2_clean_living_room:
+    name: Living Room
+    initial: !secret vacuum2_living_room
+  vacuum2_clean_bathroom:
+    name: Bathroom
+    initial: !secret vacuum2_bathroom
+  vacuum2_clean_office:
+    name: Office
+    initial: !secret vacuum2_office
+  vacuum2_clean_breakfast_room:
+    name: Breakfast Room
+    initial: !secret vacuum2_breakfast_room
+  vacuum2_clean_master_ensuite:
+    name: Master Ensuite
+    initial: !secret vacuum2_master_ensuite
+  vacuum2_clean_master_bedroom:
+    name: Master Bedroom
+    initial: !secret vacuum2_master_bedroom
+  vacuum2_clean_dining_room:
+    name: Dining Room
+    initial: !secret vacuum2_dining_room
+#  vacuum2_clean_master_passage:
+#      name: Master Passage
+#      initial: !secret vacuum2_master_passage
+#  vacuum2_clean_table:
+#    name: Table
+#    initial: !secret vacuum2_table
+
+###################################
+# Input Number
+###################################
+
+input_number:
+  vacuum2_clean_kitchen_settings:
+    name: Kitchen Settings
+    initial: 0
+    min: 0
+    max: 127
+  vacuum2_clean_entry_settings:
+    name: Entry Settings
+    initial: 0
+    min: 0
+    max: 127
+  vacuum2_clean_hall_settings:
+    name: Hall Settings
+    initial: 0
+    min: 0
+    max: 127
+  vacuum2_clean_living_room_settings:
+    name: Living Room Settings
+    initial: 0
+    min: 0
+    max: 127
+  vacuum2_clean_bathroom_settings:
+    name: Bathroom Settings
+    initial: 0
+    min: 0
+    max: 127
+  vacuum2_clean_office_settings:
+    name: Office Settings
+    initial: 0
+    min: 0
+    max: 127
+  vacuum2_clean_breakfast_room_settings:
+    name: Breakfast Room Settings
+    initial: 0
+    min: 0
+    max: 127
+  vacuum2_clean_master_ensuite_settings:
+    name: Master Ensuite Settings
+    initial: 0
+    min: 0
+    max: 127
+  vacuum2_clean_master_bedroom_settings:
+    name: Master Bedroom Settings
+    initial: 0
+    min: 0
+    max: 127
+  vacuum2_clean_dining_room_settings:
+    name: Dining Room Settings
+    initial: 0
+    min: 0
+    max: 127
+#  vacuum2_clean_master_passage_settings:
+#      name: Master Passage
+#      initial: 0
+#  vacuum2_clean_table_settings:
+#    name: Table
+#    initial: 0
+
+###################################
+# Group
+###################################
+
+group:
+  vacuum2_rooms:
+    entities:
+      - input_boolean.vacuum2_clean_kitchen
+      - input_boolean.vacuum2_clean_entry
+      - input_boolean.vacuum2_clean_hall
+      - input_boolean.vacuum2_clean_living_room
+      - input_boolean.vacuum2_clean_dining_room
+      - input_boolean.vacuum2_clean_bathroom
+      - input_boolean.vacuum2_clean_office
+      - input_boolean.vacuum2_clean_breakfast_room
+      - input_boolean.vacuum2_clean_master_ensuite
+      - input_boolean.vacuum2_clean_master_bedroom
+
+###################################
+# Automation
+###################################
+
+automation:
+  # Initiate Selective Room Clean
+  # Add in parameters on line 485ish.
+  # Vac only is operatingMode = 2, vac + mop is operatingMode = 6 | bitwise 4
+  # twoPass is a boolean for two passes                           | bitwise 2
+  # vacHigh = true && carpetBoost = false   | high power vacuum   | bitwise 16
+  # vacHigh = false && carpetBoost = false  | low power vacuum
+  # vacHigh = false && carpetBoost = true   | normal power vacuum
+  # swScrub = 1 for scrub mode                                    | bitwise 8
+  # For heavy fluid use, values = 3, for medium fluid, values = 2, for low fluid use, values = 1:
+  # padWetness {
+  #   disposable = 3
+  #   reusable = 3
+  # }
+
+  - alias: Vacuum2 Clean Rooms
+    id: vac2_clean_room
+    trigger:
+      - platform: event
+        event_type: initiate_vacuum2_clean
+    condition:
+      condition: not
+      conditions:
+        - condition: state
+          entity_id: input_text.vacuum2_rooms
+          state: ""
+    action:
+      - service: rest_command.vacuum2_clean
+        data_template:
+          payload: >
+            {% set rooms = states('input_text.vacuum2_rooms') %}
+            {% if rooms[-1:] == ',' %}
+            {% set rooms = rooms[:-1] %}
+            {% endif %}
+            {% set rooms = rooms.split(",") %}
+            {
+              "ordered": 1,
+              "pmap_id": "{{ state_attr('sensor.vacuum2', 'pmap0_id') | string }}",
+              "regions": [{% for id in rooms %}
+                {% set parameters = '{"params":{"noAutoPasses": true,' %}
+                {% set settings = states('input_number.vacuum2_clean_'+id+'_settings') %}
+                {% if settings | int | bitwise_and(2) %}
+                {% set parameters = parameters + '"twoPass": true,' %}
+                {% endif %}
+                {% if settings | int | bitwise_and(4) %}
+                {% set parameters = parameters + '"operatingMode":6,"padWetness":{"disposable":2,"reusable":2},' %}
+                {% else %}
+                {% set parameters = parameters + '"operatingMode":2,' %}
+                {% endif %}
+                {% if settings | int | bitwise_and(8) %}
+                {% set parameters = parameters + '"swScrub":1,' %}
+                {% elif settings | int | bitwise_and(4) %}
+                {% set parameters = parameters + '"swScrub":0,' %}
+                {% endif %}
+                {% if settings | int | bitwise_and(16) %}
+                {% set parameters = parameters + '"carpetBoost": false,"vacHigh": true,' %}
+                {% else %}
+                {% set parameters = parameters + '"carpetBoost": true,"vacHigh": false,' %}
+                {% endif %}
+                {% set parameters = parameters | trim(',') %}
+                {% set parameters = parameters + '},' %}
+                {% set room = 'input_text.vacuum2_clean_' + id %}
+                {% set roomtext = parameters + states(room).replace('{',"") %}
+                {{roomtext | string}}
+                {%- if not loop.last %},{%- endif %}
+                {%- endfor %}
+              ]
+            }
+      - service: input_text.set_value
+        data:
+          entity_id: input_text.vacuum2_rooms
+          value: ""
+      - service: input_boolean.turn_off
+        data:
+          entity_id: group.vacuum2_rooms
+
+  # Update Vacuum REST Sensor for Location Details
+  - alias: Vacuum2 Update Location
+    initial_state: true
+    trigger:
+      - platform: time_pattern
+        seconds: /2
+      - platform: event
+        event_type: call_service
+        event_data:
+          domain: rest_command
+          service: vacuum2_clean
+    condition:
+      condition: or
+      conditions:
+        - condition: template
+          value_template: "{{ is_state_attr('sensor.vacuum2', 'phase', 'Run') }}"
+        - condition: template
+          value_template: "{{ is_state_attr('sensor.vacuum2', 'phase', 'Sent Home') }}"
+        - condition: template
+          value_template: "{{ is_state_attr('sensor.vacuum2', 'phase', 'Mid Dock') }}"
+        - condition: template
+          value_template: "{{ is_state_attr('sensor.vacuum2', 'phase', 'Final Dock') }}"
+    action:
+      - service: homeassistant.update_entity
+        entity_id: sensor.rest980_2
+
+  # Log Vacuum Location to File
+  - alias: Vacuum2 Log Position
+    initial_state: true
+    trigger:
+      platform: state
+      entity_id: sensor.vacuum2_location
+    condition:
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: sensor.vacuum2
+          state: "Clean"
+        - condition: state
+          entity_id: sensor.vacuum2
+          state: "Train"
+    action:
+      - service: notify.vacuum2file
+        data_template:
+          message: "{{ states('sensor.vacuum2_location') }}"
+
+  # Initialize Blank Vacuum Log File
+  - alias: Vacuum2 Clean Log
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: sensor.vacuum2
+        from: "Ready"
+        to: "Clean"
+      - platform: state
+        entity_id: sensor.vacuum2
+        from: "Ready"
+        to: "Train"
+    action:
+      - service: shell_command.vacuum2_clear_log
+      - service: shell_command.vacuum2_clear_image
+
+  # Update Vacuum Log File with Finished Status
+  - alias: Vacuum2 Notify on Finished Cleaning
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: sensor.vacuum2
+        from: "Clean"
+        to: "Ready"
+      - platform: state
+        entity_id: sensor.vacuum2
+        from: "Train"
+        to: "Ready"
+      - platform: state
+        entity_id: sensor.vacuum2
+        from: "Pending"
+        to: "Ready"
+    action:
+      - service: notify.vacuum2file
+        data_template:
+          message: "Finished"
+
+  # Update Vacuum Log File with Stuck Status
+  - alias: Vacuum2 Notify on Stuck Status
+    initial_state: true
+    trigger:
+      platform: template
+      value_template: "{{ is_state_attr('sensor.vacuum2', 'phase', 'Stuck') }}"
+    action:
+      - service: notify.vacuum2file
+        data_template:
+          message: "Stuck"
+      # DELETE BELOW SECTION IF YOU DONT WANT NOTIFICATIONS
+      - delay: 5
+      - service: !secret vacuum2_notify
+        data_template:
+          title: "{{ state_attr('sensor.rest980_2', 'name') }} requires your attention"
+          message: "{{ state_attr('sensor.rest980_2', 'name') }} is stuck."
+          # =============
+          # NOTICE THIS SECTION IS VALID FOR IOS USERS ONLY!
+          data:
+            attachment:
+              content-type: jpeg
+            push:
+              category: camera
+            entity_id: camera.roomba
+          # =============
+
+  # Generate Complete Vacuum Map
+  - alias: Vacuum2 Generate Image after Cleaning
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: sensor.vacuum2
+        from: "Clean"
+        to: "Ready"
+        for:
+          seconds: 10
+      - platform: state
+        entity_id: sensor.vacuum2
+        from: "Train"
+        to: "Ready"
+        for:
+          seconds: 10
+      - platform: state
+        entity_id: sensor.vacuum2
+        from: "Pending"
+        to: "Ready"
+        for:
+          seconds: 10
+    action:
+      - service: shell_command.vacuum2_generate_image
+      # DELETE BELOW SECTION IF YOU DONT WANT NOTIFICATIONS
+      - delay: 5
+      - service: !secret vacuum2_notify
+        data_template:
+          title: "{{ state_attr('sensor.rest980_2', 'name') }}"
+          message: "{{ state_attr('sensor.rest980_2', 'name') }} successfully completed a job!"
+          # =============
+          # NOTICE THIS SECTION IS VALID FOR IOS USERS ONLY!
+          data:
+            attachment:
+              content-type: jpeg
+            push:
+              category: camera
+            entity_id: camera.roomba
+          # =============
+
+  # Maintenance Check
+  - alias: Vacuum2 Maintenance Check
+    initial_state: true
+    trigger:
+      - platform: time_pattern
+        minutes: /15
+      - platform: state
+        entity_id:
+          [
+            "sensor.vacuum2_maint_clean_brushes",
+            "sensor.vacuum2_maint_clean_contacts",
+            "sensor.vacuum2_maint_clean_filter",
+            "sensor.vacuum2_maint_clean_wheel",
+            "sensor.vacuum2_maint_clean_bin",
+            "sensor.vacuum2_maint_replace_brushes",
+            "sensor.vacuum2_maint_replace_filter",
+            "sensor.vacuum2_maint_replace_wheel",
+          ]
+    action:
+      - service: >-
+          {% set ns = namespace(count = 0) %}
+          {% for item in states.sensor if 'sensor.vacuum2_maint' in item.entity_id and (state_attr(item.entity_id, 'timeout_timestamp') < as_timestamp(now())) %}
+            {% set ns.count = loop.index %}
+          {% endfor %}
+          {% if ns.count > 0 %}
+            input_boolean.turn_on
+          {% else %}
+            input_boolean.turn_off
+          {% endif %}
+        entity_id: input_boolean.vacuum2_maint_due
+
+  # Add Rooms for Ordered Cleaning
+  - alias: Vacuum2 Add Rooms for Cleaning
+    initial_state: true
+    trigger:
+      platform: state
+      entity_id:
+        [
+          "input_boolean.vacuum2_clean_kitchen",
+          "input_boolean.vacuum2_clean_zone_fridge",
+          "input_boolean.vacuum2_clean_entry",
+          "input_boolean.vacuum2_clean_hall",
+          "input_boolean.vacuum2_clean_living_room",
+          "input_boolean.vacuum2_clean_bathroom",
+          "input_boolean.vacuum2_clean_bedroom",
+          "input_boolean.vacuum2_clean_wardrobe",
+          "input_boolean.vacuum2_clean_master_ensuite",
+          "input_boolean.vacuum2_clean_master_bedroom",
+          "input_boolean.vacuum2_clean_master_passage",
+          "input_boolean.vacuum2_clean_table",
+        ]
+      to: "on"
+    action:
+      service: input_text.set_value
+      data_template:
+        entity_id: input_text.vacuum2_rooms
+        value: |
+          {% set room = trigger.entity_id %}
+          {% set room = room.replace("input_boolean.vacuum2_clean_","") %}
+          {% if ((states('input_text.vacuum2_rooms') == "unknown") or (states('input_text.vacuum2_rooms') == "")) %}
+            {{ room }},
+          {% else %}
+            {{ states('input_text.vacuum2_rooms') }}{{ room }},
+          {% endif %}
+
+  # Remove Rooms for Ordered Cleaning
+  - alias: Vacuum2 Remove Rooms for Cleaning
+    id: vac2_remove_room
+    initial_state: true
+    trigger:
+      platform: state
+      entity_id:
+        [
+          "input_boolean.vacuum2_clean_kitchen",
+          "input_boolean.vacuum2_clean_zone_fridge",
+          "input_boolean.vacuum2_clean_entry",
+          "input_boolean.vacuum2_clean_hall",
+          "input_boolean.vacuum2_clean_living_room",
+          "input_boolean.vacuum2_clean_bathroom",
+          "input_boolean.vacuum2_clean_bedroom",
+          "input_boolean.vacuum2_clean_wardrobe",
+          "input_boolean.vacuum2_clean_master_ensuite",
+          "input_boolean.vacuum2_clean_master_bedroom",
+          "input_boolean.vacuum2_clean_master_passage",
+          "input_boolean.vacuum2_clean_table",
+        ]
+      to: "off"
+    action:
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.vacuum2_rooms
+          value: |
+            {% set room = trigger.entity_id %}
+            {% set room = room.replace("input_boolean.vacuum2_clean_","") %}
+            {% set result = states('input_text.vacuum2_rooms') %}
+            {% set result = result.replace(room + ",","") %}
+            {{ result }}
+      - service: input_number.set_value
+        data_template:
+          entity_id: |
+            {% set room = trigger.entity_id %}
+            {% set room = room.replace("input_boolean.vacuum2_clean_","") %}
+            {% set settings = "input_number.vacuum2_clean_" + room + "_settings" %}
+            {{ settings }}
+          value: 0
+
+  # Vacuum Cleaning Schedule 1
+  - alias: Vacuum2 Cleaning Schedule 1
+    initial_state: true
+    trigger:
+      platform: time_pattern
+      hours: "6"
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.vacuum2_schedule_1
+          state: "on"
+        - condition: state
+          entity_id: input_boolean.vacation
+          state: "off"
+    action:
+      - service: input_text.set_value
+        entity_id: input_text.vacuum2_rooms
+        data_template:
+          entity_id: input_text.vacuum2_rooms
+          value: "kitchen"
+      - service: automation.trigger
+        entity_id: automation.vacuum2_clean_rooms
+
+  # Vacuum Cleaning Schedule 2
+  - alias: Vacuum2 Cleaning Schedule 2
+    initial_state: true
+    trigger:
+      platform: time_pattern
+      hours: "10"
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.vacuum2_schedule_2
+          state: "on"
+        - condition: state
+          entity_id: input_boolean.vacation
+          state: "off"
+        - condition: time
+          weekday:
+            - mon
+            - wed
+            - fri
+    action:
+      - service: input_text.set_value
+        entity_id: input_text.vacuum2_rooms
+        data_template:
+          entity_id: input_text.vacuum2_rooms
+          value: "kitchen,entry,hall,living_room,bathroom,bedroom,wardrobe,master_ensuite,master_passage"
+      - service: automation.trigger
+        entity_id: automation.vacuum2_clean_rooms
+
+  # Delete Old Vacuum Image Files
+  - alias: Vacuum2 Delete Images
+    initial_state: true
+    trigger:
+      platform: time_pattern
+      hours: "00"
+    action:
+      - service: shell_command.vacuum2_delete_images
+
+###################################
+# Notify
+###################################
+
+notify:
+  - name: Vacuum2File
+    platform: file
+    filename: !secret vacuum2_log
+
+###################################
+# Camera
+###################################
+
+camera:
+  - platform: generic
+    still_image_url: >-
+      {{ states('input_text.vacuum2_map') }}
+    content_type: image/png
+    name: Roomba2
+
+###################################
+# Shell Command
+###################################
+
+shell_command:
+  vacuum2_clear_log: cp /dev/null {{ states('input_text.vacuum2_log') }}
+  vacuum2_clear_image: curl -X GET -s -O /dev/null '{{ states("input_text.vacuum2_map") }}?clear=true'
+  vacuum2_generate_image: curl -X GET -s -O /dev/null '{{ states("input_text.vacuum2_map") }}?last=true'
+  vacuum2_delete_images: find {{ states('input_text.vacuum2_dir') }} -regex ".*[0-9]\.png" -type f -mtime +20 -exec rm -f {} \;
