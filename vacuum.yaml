@@ -33,12 +33,18 @@ sensor:
   - platform: template
     sensors:
       vacuum:
+        # Note: Using defensive dictionary access (.get() with fallback {}) to prevent
+        # Jinja UndefinedError / TypeError on Home Assistant 2021.10+ if sensor.rest980
+        # is booting or temporarily unavailable.
         friendly_name_template: >-
-          {{ state_attr('sensor.rest980', 'name') }}
+          {{ state_attr('sensor.rest980', 'name') or 'Vacuum' }}
         value_template: >-
-          {% if state_attr('sensor.rest980', 'cleanMissionStatus')['cycle'] == 'none' and state_attr('sensor.rest980', 'cleanMissionStatus')['notReady'] == 39 %}
+          {% set mission = state_attr('sensor.rest980', 'cleanMissionStatus') %}
+          {% if mission is not mapping %}
+            Ready
+          {% elif mission.get('cycle') == 'none' and mission.get('notReady') == 39 %}
             Pending
-          {% elif state_attr('sensor.rest980', 'cleanMissionStatus')['notReady'] > 0 %}
+          {% elif (mission.get('notReady') | default(0, true) | int) > 0 %}
             Not Ready
           {% else %}
           {% set mapper =  {
@@ -49,7 +55,7 @@ sensor:
             'dock' : 'Dock',
             'train' : 'Train',
             'none' : 'Ready' } %}
-          {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['cycle'] %}
+          {% set state =  mission.get('cycle') %}
           {{ mapper[state] if state in mapper else state }}
           {% endif %}
         icon_template: mdi:robot-vacuum
@@ -61,19 +67,22 @@ sensor:
               15 : 'Low Battery',
               39 : 'Pending',
               48 : 'Path Blocked' } %}
-            {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['notReady'] %}
+            {% set mission = state_attr('sensor.rest980', 'cleanMissionStatus') %}
+            {% set state = mission.get('notReady') if mission is mapping else none %}
             {{ mapper[state] if state in mapper else state }}
           error_msg: >-
             {% set mapper =  {
               0 : 'n-a',
               15 : 'Reboot Required',
               18 : 'Docking Issue'} %}
-            {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['error'] %}
+            {% set mission = state_attr('sensor.rest980', 'cleanMissionStatus') %}
+            {% set state = mission.get('error') if mission is mapping else none %}
             {{ mapper[state] if state in mapper else state }}
           battery: >-
-            {{ state_attr('sensor.rest980', 'batPct') }} %
+            {% set bat = state_attr('sensor.rest980', 'batPct') %}
+            {{ bat ~ ' %' if bat is not none else 'n-a' }}
           software_ver: >-
-            {% if state_attr('sensor.rest980', 'softwareVer') is defined %}
+            {% if state_attr('sensor.rest980', 'softwareVer') is not none %}
               {% set version = state_attr('sensor.rest980', 'softwareVer') %}
               {% if '+' in version %}
                 {{ version.split('+')[1] }} 
@@ -84,37 +93,54 @@ sensor:
               n-a
             {% endif %}
           phase: >-
-            {% if state_attr('sensor.rest980', 'cleanMissionStatus')['phase'] == 'charge' and state_attr('sensor.rest980', 'batPct') == 100 %}
-              Idle
-            {% elif state_attr('sensor.rest980', 'cleanMissionStatus')['cycle'] == 'none' and state_attr('sensor.rest980', 'cleanMissionStatus')['phase'] == 'stop' %}
-              Stopped
+            {% set mission = state_attr('sensor.rest980', 'cleanMissionStatus') %}
+            {% set bat = state_attr('sensor.rest980', 'batPct') %}
+            {% if mission is mapping %}
+              {% if mission.get('phase') == 'charge' and bat == 100 %}
+                Idle
+              {% elif mission.get('cycle') == 'none' and mission.get('phase') == 'stop' %}
+                Stopped
+              {% else %}
+              {% set mapper =  {
+                'charge' : 'Charge',
+                'run' : 'Run',
+                'evac' : 'Empty',
+                'stop' : 'Paused',
+                'stuck' : 'Stuck',
+                'hmUsrDock' : 'Sent Home',
+                'hmMidMsn' : 'Mid Dock',
+                'hmPostMsn' : 'Final Dock' } %}
+              {% set state =  mission.get('phase') %}
+              {{ mapper[state] if state in mapper else state }}
+              {% endif %}
             {% else %}
-            {% set mapper =  {
-              'charge' : 'Charge',
-              'run' : 'Run',
-              'evac' : 'Empty',
-              'stop' : 'Paused',
-              'stuck' : 'Stuck',
-              'hmUsrDock' : 'Sent Home',
-              'hmMidMsn' : 'Mid Dock',
-              'hmPostMsn' : 'Final Dock' } %}
-            {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['phase'] %}
-            {{ mapper[state] if state in mapper else state }}
+              n-a
             {% endif %}
           bin: >-
-            {% set mapper =  {
-              true : 'Full',
-              false : 'Not Full' } %}
-            {% set state =  state_attr('sensor.rest980', 'bin')['full'] %}
-            {{ mapper[state] if state in mapper else state }}
+            {% set bin = state_attr('sensor.rest980', 'bin') %}
+            {% if bin is mapping and bin.get('full') is not none %}
+              {% set mapper =  {
+                true : 'Full',
+                false : 'Not Full' } %}
+              {% set state =  bin.get('full') %}
+              {{ mapper[state] if state in mapper else state }}
+            {% else %}
+              n-a
+            {% endif %}
           bin_present: >-
-            {% set mapper =  {
-              true : 'Yes',
-              false : 'No' } %}
-            {% set state =  state_attr('sensor.rest980', 'bin')['present'] %}
-            {{ mapper[state] if state in mapper else state }}
+            {% set bin = state_attr('sensor.rest980', 'bin') %}
+            {% if bin is mapping and bin.get('present') is not none %}
+              {% set mapper =  {
+                true : 'Yes',
+                false : 'No' } %}
+              {% set state =  bin.get('present') %}
+              {{ mapper[state] if state in mapper else state }}
+            {% else %}
+              n-a
+            {% endif %}
           clean_base: >-
-            {% if state_attr('sensor.rest980', 'dock')['state'] is defined %}
+            {% set dock = state_attr('sensor.rest980', 'dock') %}
+            {% if dock is mapping and dock.get('state') is not none %}
               {% set mapper =  {
                 300 : 'Ready',
                 301 : 'Ready',
@@ -125,67 +151,80 @@ sensor:
                 352 : 'Sealing Problem',
                 353 : 'Bag Full',
                 360 : 'Comms Problem' } %}
-              {% set state =  state_attr('sensor.rest980', 'dock')['state'] %}
+              {% set state =  dock.get('state') %}
               {{ mapper[state] if state in mapper else state }}
             {% else %}
               n-a
             {% endif %}
           location: >-
-            {% if state_attr('sensor.rest980', 'pose')['theta'] is defined %}
-              ({{ state_attr('sensor.rest980', 'pose')['point']['x'] }}, {{ state_attr('sensor.rest980', 'pose')['point']['y'] }}, {{ state_attr('sensor.rest980', 'pose')['theta'] }})
+            {% set pose = state_attr('sensor.rest980', 'pose') %}
+            {% if pose is mapping and pose.get('theta') is not none and pose.get('point') is mapping %}
+              ({{ pose.point.get('x') }}, {{ pose.point.get('y') }}, {{ pose.get('theta') }})
             {% else %}
               n-a
             {% endif %}
           rssi: >-
-            {% if state_attr('sensor.rest980', 'signal')['rssi'] is defined %}
-              {{ state_attr('sensor.rest980', 'signal')['rssi'] }}
+            {% set sig = state_attr('sensor.rest980', 'signal') %}
+            {% if sig is mapping and sig.get('rssi') is not none %}
+              {{ sig.get('rssi') }}
             {% else %}
               n-a
             {% endif %}
           total_area: >-
-            {% if state_attr('sensor.rest980', 'runtimeStats')['sqft'] is defined %}
-              {{ (state_attr('sensor.rest980', 'runtimeStats')['sqft'] / 10.764 * 100)| round() }}m²
+            {% set stats = state_attr('sensor.rest980', 'runtimeStats') %}
+            {% if stats is mapping and stats.get('sqft') is not none %}
+              {{ (stats.get('sqft') / 10.764 * 100)| round() }}m²
             {% else %}
               n-a
             {% endif %}
           #   {{ (state_attr('sensor.rest980', 'runtimeStats')['sqft'] }}ft²
           total_time: >-
-            {% if state_attr('sensor.rest980', 'runtimeStats')['hr'] is defined %}
-              {{ state_attr('sensor.rest980', 'runtimeStats')['hr'] }}h {{ state_attr('sensor.rest980', 'runtimeStats')['min'] }}m
+            {% set stats = state_attr('sensor.rest980', 'runtimeStats') %}
+            {% if stats is mapping and stats.get('hr') is not none and stats.get('min') is not none %}
+              {{ stats.get('hr') }}h {{ stats.get('min') }}m
             {% else %}
               n-a
             {% endif %}
           total_jobs: >-
-            {% if state_attr('sensor.rest980', 'bbmssn')['nMssn'] is defined %}
-              {{ state_attr('sensor.rest980', 'bbmssn')['nMssn'] }}
+            {% set bbmssn = state_attr('sensor.rest980', 'bbmssn') %}
+            {% if bbmssn is mapping and bbmssn.get('nMssn') is not none %}
+              {{ bbmssn.get('nMssn') }}
             {% else %}
               n-a
             {% endif %}
           dirt_events: >-
-            {% if state_attr('sensor.rest980', 'bbrun')['nScrubs'] is defined %}
-              {{ state_attr('sensor.rest980', 'bbrun')['nScrubs'] }}
+            {% set bbrun = state_attr('sensor.rest980', 'bbrun') %}
+            {% if bbrun is mapping and bbrun.get('nScrubs') is not none %}
+              {{ bbrun.get('nScrubs') }}
             {% else %}
               n-a
             {% endif %}
           # evac_events I7+/S9+ Models (Clean Base)
           evac_events: >-
-            {% if state_attr('sensor.rest980', 'bbrun')['nEvacs'] is defined %}
-              {{ state_attr('sensor.rest980', 'bbrun')['nEvacs'] }}  
+            {% set bbrun = state_attr('sensor.rest980', 'bbrun') %}
+            {% if bbrun is mapping and bbrun.get('nEvacs') is not none %}
+              {{ bbrun.get('nEvacs') }}  
             {% else %}
               n-a
             {% endif %}
           job_initiator: >-
-            {% set mapper =  {
-              'schedule' : 'Scheduler',
-              'rmtApp' : 'App',
-              'manual' : 'Robot',
-              'localApp' : 'HA' } %}
-            {% set state =  state_attr('sensor.rest980', 'cleanMissionStatus')['initiator'] %}
-            {{ mapper[state] if state in mapper else state }}
+            {% set mission = state_attr('sensor.rest980', 'cleanMissionStatus') %}
+            {% if mission is mapping and mission.get('initiator') is not none %}
+              {% set mapper =  {
+                'schedule' : 'Scheduler',
+                'rmtApp' : 'App',
+                'manual' : 'Robot',
+                'localApp' : 'HA' } %}
+              {% set state =  mission.get('initiator') %}
+              {{ mapper[state] if state in mapper else state }}
+            {% else %}
+              n-a
+            {% endif %}
           job_time: >-
-            {% if state_attr('sensor.rest980', 'cleanMissionStatus')['mssnStrtTm'] is defined %}
-              {% if state_attr('sensor.rest980', 'cleanMissionStatus')['mssnStrtTm'] != 0 %}
-                {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['mssnStrtTm'] | timestamp_local %}
+            {% set mission = state_attr('sensor.rest980', 'cleanMissionStatus') %}
+            {% if mission is mapping and mission.get('mssnStrtTm') is not none %}
+              {% if mission.get('mssnStrtTm') != 0 %}
+                {% set time = mission.get('mssnStrtTm') | timestamp_local %}
                 {% set elapsed = ((as_timestamp(now()) - as_timestamp(time)) / 60) | round(0) %}
                 {% if elapsed > 60 %}
                   {{ elapsed // 60 }}h {{ '{:0>2d}'.format(elapsed%60) }}m
@@ -199,9 +238,10 @@ sensor:
               n-a
             {% endif %}
           job_recharge: >-
-            {% if state_attr('sensor.rest980', 'cleanMissionStatus')['rechrgTm'] is defined %}
-              {% if state_attr('sensor.rest980', 'cleanMissionStatus')['rechrgTm'] != 0 %}
-                {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['rechrgTm'] | timestamp_local %}
+            {% set mission = state_attr('sensor.rest980', 'cleanMissionStatus') %}
+            {% if mission is mapping and mission.get('rechrgTm') is not none %}
+              {% if mission.get('rechrgTm') != 0 %}
+                {% set time = mission.get('rechrgTm') | timestamp_local %}
                 {% set resume = ((as_timestamp(time) - as_timestamp(now())) / 60) | round(0) %}
                 {% if resume > 60 %}
                   {{ resume // 60 }}h {{ '{:0>2d}'.format(resume%60) }}m
@@ -215,9 +255,10 @@ sensor:
               n-a
             {% endif %}
           job_expires: >-
-            {% if state_attr('sensor.rest980', 'cleanMissionStatus')['expireTm'] is defined %}
-              {% if state_attr('sensor.rest980', 'cleanMissionStatus')['expireTm'] != 0 %}
-                {% set time = state_attr('sensor.rest980', 'cleanMissionStatus')['expireTm'] | timestamp_local %}
+            {% set mission = state_attr('sensor.rest980', 'cleanMissionStatus') %}
+            {% if mission is mapping and mission.get('expireTm') is not none %}
+              {% if mission.get('expireTm') != 0 %}
+                {% set time = mission.get('expireTm') | timestamp_local %}
                 {% set resume = ((as_timestamp(time) - as_timestamp(now())) / 60) | round(0) %}
                 {% if resume > 60 %}
                   {{ resume // 60 }}h {{ '{:0>2d}'.format(resume%60) }}m
@@ -231,7 +272,7 @@ sensor:
               n-a
             {% endif %}
           clean_mode: >-
-            {% if state_attr('sensor.rest980', 'noAutoPasses') is defined and state_attr('sensor.rest980', 'twoPass') is defined %}
+            {% if state_attr('sensor.rest980', 'noAutoPasses') is not none and state_attr('sensor.rest980', 'twoPass') is not none %}
               {% if state_attr('sensor.rest980', 'noAutoPasses') == true and state_attr('sensor.rest980', 'twoPass') == false %}
                 One
               {% elif state_attr('sensor.rest980', 'noAutoPasses') == true and state_attr('sensor.rest980', 'twoPass') == true %}
@@ -243,7 +284,7 @@ sensor:
               n-a
             {% endif %}
           carpet_boost: >-
-            {% if state_attr('sensor.rest980', 'vacHigh') is defined %}
+            {% if state_attr('sensor.rest980', 'vacHigh') is not none %}
               {% if state_attr('sensor.rest980', 'vacHigh') == false and state_attr('sensor.rest980', 'carpetBoost') == false %}
                 Eco
               {% elif state_attr('sensor.rest980', 'vacHigh') == true and state_attr('sensor.rest980', 'carpetBoost') == false %}
@@ -255,7 +296,7 @@ sensor:
               n-a
             {% endif %}
           clean_edges: >-
-            {% if state_attr('sensor.rest980', 'openOnly') is defined %}
+            {% if state_attr('sensor.rest980', 'openOnly') is not none %}
               {% if state_attr('sensor.rest980', 'openOnly') == true %}
                 False
               {% else %}
@@ -272,14 +313,15 @@ sensor:
             {% endif %}
           # pmap0_id I7/S9 Models
           pmap0_id: >-
-            {% if state_attr('sensor.rest980', 'pmaps')[0] is defined %}
-              {{ state_attr('sensor.rest980', 'pmaps')[0] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
+            {% set pmaps = state_attr('sensor.rest980', 'pmaps') %}
+            {% if pmaps is iterable and pmaps | length > 0 %}
+              {{ pmaps[0] | regex_findall_index("{'([\w\-]+)': '\w+'}") }}
             {% else %}
               n-a
             {% endif %}
       vacuum_location:
         friendly_name_template: >-
-          {{ state_attr('sensor.rest980', 'name') }} Location
+          {{ state_attr('sensor.rest980', 'name') or 'Vacuum' }} Location
         value_template: >-
           {{ state_attr('sensor.vacuum', 'location') }}
         icon_template: mdi:home-map-marker
